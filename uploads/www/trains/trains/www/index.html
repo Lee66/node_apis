@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link href="../../bower_components/ionic/release/css/ionic.css" rel="stylesheet">
+    <link href="../../bower_components/angularjs-toaster/toaster.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/theme.css" rel="stylesheet">
+
+    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
+    <link href="css/ionic.app.css" rel="stylesheet">
+    -->
+
+    <!-- ionic/angularjs js -->
+    <script src="../../bower_components/ionic/release/js/ionic.bundle.js"></script>
+    <script src="../../bower_components/lodash/lodash.js"></script>
+    <script src="../../bower_components/angularjs-toaster/toaster.js"></script>
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="../../cordova.js"></script>
+
+    <!-- your app's js -->
+    <script src="js/app.js"></script>
+    <script src="js/ng.lodash.js"></script>
+    <script src="js/ngcordova.plugins.jfservice.js"></script>
+    <script src="js/routes.js"></script>
+    <script src="js/services.js"></script>
+    <script src="js/piper.services.js"></script>
+    <script src="js/controllers/main.js"></script>
+  </head>
+  <body id="app">
+      <toaster-container toaster-options="{&apos;time-out&apos;: 6000, &apos;animation-class&apos;: &apos;toast-top-center&apos; ,&apos;limit&apos;:1 }"></toaster-container>
+       <ion-nav-bar class="bar-stable">
+        <ion-nav-back-button>
+        </ion-nav-back-button>
+      </ion-nav-bar>
+      <ion-nav-view></ion-nav-view>
+      <script>
+       function bootstrapAngular() {
+           var app = document.getElementById('app');
+           angular.bootstrap(app, ["train"]);
+       }
+       function notify2web(args){
+           var app = document.getElementById('app');
+           angular.element(app).injector().get('$jf').onNotification(args)
+       }
+      document.addEventListener("deviceready", bootstrapAngular, false);
+      </script>
+
+  </body>
+</html>

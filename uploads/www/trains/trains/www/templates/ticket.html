@@ -1,0 +1,49 @@
+<ion-view view-title="火车票" hide-nav-bar="true">
+  <ion-header-bar class="bar-positive">
+    <button class="button button-icon icon ion-chevron-left" ng-click="backToApp()"></button>
+    <h1 class="title" style="margin-left: 0px;">火车票</h1>
+    <button class="button button-clear" ng-click="toOrder()">订单</button>
+  </ion-header-bar>
+  <ion-content class="p_t_20">
+    <div class="list text-center row-no-padding">
+      <div class="item row">
+        <div class="col col-40" ng-click="getStation('out')">
+          <div class="padding-bottom"><img class="height_16 m_r_5" ng-src="{{'paper-plane' | icon_url}}"/>出发地</div>
+          <div class="f_s_160b padding-top">{{form.outCity}}</div>
+        </div>
+        <div class="col col-20" ng-click="changeStation()">
+          <img class="height_30 m_t_15" ng-src="{{'change' | icon_url}}">
+        </div>
+        <div class="col col-40" ng-click="getStation('arr')">
+          <div class="padding-bottom"><img class="height_16 m_r_5" ng-src="{{'map' | icon_url}}"/>目的地</div>
+          <div class="f_s_160b padding-top">{{form.arrCity}}</div>
+        </div>
+      </div>
+    </div>
+    <input class="text-right" id="date_picker" type="date"ng-model="form.outDate" required />
+    <div class="list">
+      <div class="item">
+        <img class="width_20 absolute" ng-src="{{'Calendar' | icon_url}}">
+        <span class="m_l_20 color_333">出发日期</span>
+      </div>
+      <div class="item" ng-click="getTrainTime()">
+        <img class="width_20 absolute" ng-src="{{'Time' | icon_url}}">
+        <span class="m_l_20 color_333">出发时间段</span>
+        <span class="item-note">{{form.trainTime}}</span>
+      </div>
+      <div class="item" ng-click="getTrainType()">
+        <img class="width_20 absolute" ng-src="{{'sort' | icon_url}}">
+        <span class="m_l_20 color_333">车次类型</span>
+        <span class="item-note">
+        <!-- <span ng-if="form.trainType">{{form.trainType}}</span><span ng-if="!form.trainType">请选择车型</span> -->
+        {{form.trainType || "全部车型"}}
+        </span>
+      </div>
+      <div class="text-right padding f_s_140b">请阅读<span class="color_default" ng-click="showRules()">购票须知</span></div>
+      <div class="padding-left padding-right f_s_140b assertive">*所有在本软件购买的火车票只能通过窗口退票！</div>
+      <div class="padding-right padding-left">
+        <button ng-click="search()" class="button button-full button-calm border_none"><span class="f_s_120b">搜 &nbsp;索</span></button>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>

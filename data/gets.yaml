@@ -1,0 +1,13 @@
+-  request:
+      url: ^/with/parameters$
+      method: GET
+      query:
+         a: anything
+         b: more
+      # headers:
+      #    Content-Type: application/json
+   response:
+      headers:
+         Content-Type: application/json
+      status: 200
+      body: '{"error":"User nolongerhere no longer exists."}'

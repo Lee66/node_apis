@@ -1,0 +1,46 @@
+<ion-view view-title="我的订单" hide-nav-bar="true">
+  <ion-header-bar class="bar-positive">
+    <button class="button button-icon icon ion-chevron-left" ng-click="toIndex()"></button>
+    <h1 class="title">我的订单</h1>
+  </ion-header-bar>
+  <ion-content>
+    <ion-list>
+      <ion-item ng-repeat="n in form.contactPerson" href="" ng-click="payOrder(n)">
+        <div class="row">
+          <div class="col col-20 padding_0">
+           <span class='displayB color_6a84cf font_10px'>{{n.TRAIN_NO}}</span>
+            <span class='displayB color__999 font-8px'>({{n.TRAIN_NO | trainType}})</span>
+          </div>
+          <div class="col col-60 padding_0">
+            <span class="startTime font_9px displayB">
+              <i class='color_fff  text_center line_15px'>始</i><em class='color_696969'>{{n.DEP}}</em>
+              -
+              <span class='endTime  padding-top5'><i class='color_fff  text_center line_15px'>终</i><em class='color_696969'>{{n.ARR}}</em>
+            </span>
+            <span class='displayB color__999'>
+              <em class='display-inline-block padding-left-17'>{{n.GO_TIME}}</em>
+              <em class='display-inline-block padding-left-51'>{{n.TO_TIME}}</em>
+            </span>
+            <span class='displayB color_696969'>
+              出发日期:&nbsp;<em>{{n.GO_DATE}}</em>
+            </span>
+            </span>
+          </div>
+          <div class="col col-20 padding_0 text-align-right ">
+            <span class='displayB padding-top-5 font_12px color-ff4800'>￥{{n.AMOUNT}}</span>
+            <span ng-if="n.STATE == 2 && n.PAY_STATUS == 1" class='displayB font_9px padding-top-5 assertive'>待支付</span>
+            <span ng-if="n.STATE == 2 && n.PAY_STATUS == 0" class='displayB font_9px padding-top-5 assertive'>已支付，处理中</span>
+            <span ng-if="n.STATE == 1" class='displayB color__999 font_9px padding-top-5'>订单失败</span>
+            <span class='displayB color-ff9147 font_9px padding-top-5'>
+              <span ng-if="n.STATE == 0">订单处理中</span>
+              <span ng-if="n.STATE == 3">支付成功待出票</span>
+              <span ng-if="n.STATE == 5">出票失败</span>
+            </span>
+            <span ng-if="n.STATE == 4" class="displayB font_9px padding-top-5 balanced">订票成功</span>
+          </div>
+        </div>
+      </ion-item>
+      <div class="text-center f_s_140b padding color_gray" ng-if="!form.contactPerson">无历史订单信息</div>
+    </ion-list>
+  </ion-content>
+</ion-view>

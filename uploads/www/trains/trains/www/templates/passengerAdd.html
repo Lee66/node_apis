@@ -1,0 +1,44 @@
+<ion-view view-title="新增乘客">
+  <ion-content class='page_basic_background'>
+  <div class="list margin_top customHeight m_b_none">
+    <label class="item item-input">
+      <span class="input-label">乘客姓名</span>
+      <input class="text-right" type="text" placeholder='请输入真实姓名' ng-model="form.name" maxlength="5">
+    </label>
+  </div>
+  <ion-item class='customItem'>
+    选择性别
+  </ion-item>
+  <ul class="list item m_b_none">
+    <li class="item item-checkbox text_align" ng-repeat="s in form.sexData">
+       <label class="checkbox">
+         <input type="radio" name="sex" ng-model="form.sex" ng-value="s.name">
+       </label>
+      {{s.name}}
+    </li>
+  </ul>
+  <ion-item class='customItem'>
+    身份信息
+  </ion-item>
+  <div class="list">
+    <label class="item item-input">
+      <span class="input-label">手机号码</span>
+      <input class="text-right" type="text" placeholder="请输入手机号码" ng-model="form.phoneNum" maxlength="11">
+    </label>
+    <label class="item item-input item-select">
+      <span class="input-label">证件类型</span>
+      <select ng-model="form.cardType" ng-options="cardType.name for cardType in form.cardTypeData">
+      <option value="">请选择证件类型</option>
+      </select>
+    </label>
+    <label class="item item-input">
+      <span class="input-label">证件号</span>
+      <input class="text-right" type="text" placeholder="请输入证件号" ng-model="form.cardId" maxlength="18">
+    </label>
+    <div class="padding f_s_80b color_666">注：非真实信息将无法完成订票</div>
+  </div>
+  <div class="padding">
+    <button class="button button-full button-calm border_none" ng-click="contactFinsh()">保存</button>
+  </div>
+  </ion-content>
+</ion-view>

@@ -1,0 +1,88 @@
+<ion-view view-title="车票预订">
+    <ion-content  class='page_basic_background'>
+            <ion-item class='booking'>
+                  <div class='color_6a84cf  vertical_top row padding_0'>
+                        <div class="col col-20 padding_0 text_left ">
+                            <span class='f_s_120b'>{{ticket.TRAIN_NO}}</span>
+                             <span  class='color_c4c4c4 f_s_80b'>({{ticket.TRAIN_NO | trainType}})</span>
+                        </div>
+                          <div class='col col-80 padding_0'>
+                              <span class='startTime'>
+                                  <i class='color_fff text_center line_15px'>始</i>&nbsp;&nbsp;
+                                  <em class='color_696969'>{{ticket.GO_TIME}}</em>
+                                  <em class='color_696969'>{{ticket.DEP_STATION}}</em>
+                              </span>
+                              <span class='endTime padding-top5'>
+                                  <i class='color_fff text_center line_15px'>终</i>&nbsp;&nbsp;
+                                  <em class='color_696969'>{{ticket.TO_TIME}}</em>
+                                  <em class='color_696969'>{{ticket.ARR_STATION}}</em>
+                              </span>
+                              <span class='padding-top5 color_c4c4c4'>  出发日期: <em class='color_696969'>{{ticket.OUTDATE}}</em></span>
+                          </div>
+                  </div>
+            </ion-item>
+            <ion-item class='backgroundColor_f0f0f0 padding_bottom5 color_gray'>选择座位类型</ion-item>
+            <ion-item ng-repeat="n in ticket.SEAT" ng-if="n.PRICE > 0 && n.REMAIN > 0 " ng-hide="form.seatSelect == false && n.NAME == '无座' ">
+                <div class="row padding_0 line_33px">
+                  <div class="col col-25 padding_0">{{n.NAME}}</div>
+                  <div class="col col-25 padding_0">￥{{n.PRICE}}</div>
+                  <div class="col col-25 padding_0 text_center"><em>{{n.REMAIN}}</em>张</div>
+                  <div class="col col-25 padding_0 por">
+                     <label class="checkbox padding_0  custompos">
+                           <input type="radio" name="group" ng-model="form.whichSeat" ng-value="n">
+                   </label>
+                  </div>
+                </div>
+            </ion-item>
+            <ion-item class='backgroundColor_f0f0f0 padding_bottom5 color_gray'>乘客信息</ion-item>
+            <ion-item class="passergentList" href="" ng-repeat="p in form.passenger" ng-if="p.CHECKED ==='true' ">
+                <div class="row padding_0">
+                  <div class="col col-80 passergent padding_0">
+                        <span class='displayB'>
+                            <em>{{p.CNAME}}</em>
+                            <em class='color_898989'>&nbsp;&nbsp;{{p.MOBILENO}}</em>
+                        </span>
+                        <span class='displayB color_898989 font_10px padding-top8'>{{p.PIDTYPE}}&nbsp;&nbsp;&nbsp;&nbsp;<em>{{p.PID}}</em>
+                        </span>
+                  </div>
+                  <div class="col col-20 padding_0 custom-circled">
+                      <i class='ion-minus-circled' ng-click="delPas(p)"></i>
+                  </div>
+                </div>
+            </ion-item>
+            <a href="#/passengerList">
+                <ion-item>
+                  <span class='displayB por' >
+                      <i class='ion-plus-circled  curstomPo font_14px color_40b616'></i><i class='padding_left_25'>
+                        <span ng-if="form.pasCount == '0'">添加乘客</span>
+                        <span ng-if="form.pasCount != '0'">更改乘客</span>
+                      </i>
+                    </span>
+                </ion-item>
+            </a>
+            <div class="item item-divider p-t-6 color_gray">联系人信息</div>
+            <label class="item item-input">
+              <span class="input-label">姓名</span>
+              <input class="text-right" type="text" ng-model="form.contactName" maxlength="15" placeholder="输入联系人姓名">
+            </label>
+            <label class="item item-input">
+              <span class="input-label">手机号</span>
+              <input class="text-right" style="padding-right: 40px;" type="tel" ng-model="form.contactPhone" maxlength="11" placeholder="输入联系人手机号">
+            </label>
+            <div class="relative">
+              <img ng-click="selectPhone()" class="absolute select_phone" ng-src="{{'Contact' | icon_url}}"/>
+            </div>
+            <div class="p_b_20b"></div>
+    </ion-content>
+  <div class="bar bar-footer height_50">
+      <div class="row padding_none">
+        <div class="col col-75 padding_none f_s_140b">
+          <div>{{form.whichSeat.PRICE || '0'}}元&nbsp;(票价) x {{form.pasCount}}</div>
+          <div>共计 <em class='color_ff8f44'>{{form.whichSeat.PRICE * form.pasCount + 10 * form.pasCount || '0'}}元</em> (代购费:&nbsp;10元/人)</div>
+        </div>
+        <div class="col col-25 padding_none">
+              <button class="button button-block button-calm" style="margin: 0px;" ng-click="subOrder()">提交</button>
+        </div>
+      </div>
+  </div>
+</ion-view>
