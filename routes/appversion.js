@@ -1,22 +1,85 @@
 var mongoose = require("mongoose");
-var fs = require('fs'); 
+mongoose.connect("mongodb://localhost/openweb");
 var appversions = mongoose.model("appversions", {
+	appname:String,
+	appuser:String,
 	versionname:String,
-	ioscontent: String,
-	androidcontent: String,
-	webcontent: String,
+	iosbundleid:String,
+	ioscontent: Object,
+	androidcontent: Object,
+	webcontent: Object,
 	createtime:String,
 	updatetime:String
 });
 var events = require("events");
 var emitter = new events.EventEmitter();//创建了事件监听器的一个对象
-// 监听事件some_event
-// emitter.on("some_event", function(){
-//   console.log("事件触发，调用此回调函数");
-// });
-// setTimeout(function(){
-//   emitter.emit("some_event");   //触发事件some_event
-// },3000);
+//获取plist文件
+exports.getplist=function(request, response){
+	console.log(request.params.v,request.params.app);
+	var appip='https://www.jfpal.com/apps/';
+	appversions.find({
+		versionname:request.params.v,appuser:request.params.app
+	}, function(e, docs) {
+		if(e){
+			respondata={
+				"code":"500",
+				"message":"exports"
+			};
+			response.send(respondata);
+		}else{
+			console.log(docs);
+			if(docs.length>0){
+				respondata={
+				"code":"200",
+				"message":"the version is exit"
+				};
+				response.set("content-type","text/plain").render('manifest',{ appip:appip,version: docs[0].versionname,appuser:docs[0].appuser,appname:docs[0].appname,iosbundleid:docs[0].iosbundleid });
+			}else{
+				respondata={
+				"code":"500",
+				"message":"undefind"
+				};
+				response.send(respondata);
+			}
+		}
+		
+	});
+	
+}
+//获取tag值
+exports.gettag=function(request, response){
+	appversions.find({
+		versionname:request.params.v
+	}, function(e, docs) {
+		if(e){
+			respondata={
+				"code":"500",
+				"message":"exports"
+			};
+			response.send(respondata);
+		}else{
+			console.log(docs);
+			if(docs.length>0){
+				respondata={
+					"code":"200",
+					"data":{
+							"iostag":docs[0].ioscontent.tag,
+							"androidtag":docs[0].androidcontent.tag,
+							"webtag":docs[0].webcontent.tag
+					}
+				};
+				response.send(respondata);
+			}else{
+				respondata={
+				"code":"500",
+				"message":"undefind"
+				};
+				response.send(respondata);
+			}
+		}
+		
+	});
+}
 exports.createAppVersion=function(request, response){
 	console.log(request.body);
 	var data=JSON.parse(request.body.reqContent);
@@ -115,7 +178,10 @@ exports.doupdate=function(request, response){
 	var update=function(){
 		appversions.update({
 		versionname: data.reqBean.detail.versionname
-		}, {	
+		}, {
+			appname:data.reqBean.detail.appname,
+			appuser:data.reqBean.detail.appuser,
+			iosbundleid:data.reqBean.detail.iosbundleid,
 			ioscontent:data.reqBean.detail.ioscontent,
 			androidcontent:data.reqBean.detail.androidcontent,
 			webcontent:data.reqBean.detail.webcontent,
