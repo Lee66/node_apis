@@ -1,88 +1,160 @@
 var mongoose = require("mongoose");
-
+var md5=require("nodejs-md5");
+var Q= require('q');
 // 新建一个数据模型
 // 参数1：数据表
 // 参数2：数据格式
-var user = mongoose.model("user", {
+var users = mongoose.model("user", {
 	username:String,
 	phone:String,
 	password: String,
 	personfile:Object,
-	time:String,
-	updatetime:String
+	createTime:String,
+	updateTime:String
 });
 var path = require('path');
 
 exports.register = function(request, response) {
 	var data=JSON.parse(request.body.reqContent);
 	console.log(data.reqBean);
-	console.log(data.reqBean.detail);
-	// response.setHeader("Access-Control-Allow-Origin", "*");
-	// response.writeHead(200, {'Content-Type': 'text/json;charset=utf-8','Access-Control-Allow-Origin':'*'}); 
-	var app6 = new user({
-		username: data.reqBean.detail.username,
-		phone:data.reqBean.detail.phone,
-		password: data.reqBean.detail.password,
-		time:new Date().getTime(),
-		updatetime:new Date().getTime()
-	});
-	app6.save(function(e, product, numberAffected) {
-		// if (e) response.send(e.message);
-		console.log(product);
-		console.log(numberAffected);
-		if(product){
-			respondata={
-				"code":"200",
-				"message":"success"
-			};
-		}else{
-			respondata={
-				"code":"500",
-				"message":"exports"
-			};
-		}
-		response.send(respondata);
-	});
+	users.find({
+        phone:data.reqBody.phone
+    }, function(e, docs) {
+        if(e){
+                respondata={
+                    "code":"500",
+                    "message":"find error",
+                };
+                response.send(respondata);
+        }else{
+            console.log('docs:',docs);
+            if(docs&&docs.length>0){
+                respondata={
+                    "code":"200",
+                    "message":"the emial has bean used",
+                };
+                response.send(respondata);
+            }else{
+                createnew().then(function(result){
+			       console.log('type result',result)
+			       response.send(result);
+			    },function(error){
+			        response.send(error);
+			    });
+            }
+            
+        }
+    function createnew(){
+        console.log('do create');
+        var q = Q.defer();
+        var apps = new users({
+            username:data.reqBody.username,
+            password:md5.string.quiet(data.reqBody.password),
+            phone:data.reqBody.phone,
+            emial: data.reqBody.emial,
+            createTime:new Date().getTime(),
+            updateTime:new Date().getTime(),
+        });
+        apps.save(function(e, product, numberAffected) {
+            // if (e) response.send(e.message);
+            console.log(product);
+            if(product){
+                respondata={
+		            "code":"200",
+		            "message":"success"
+		          };
+                q.resolve(respondata); 
+            }else{
+                respondata={
+		            "code":"500",
+		            "message":"exports"
+		          };
+		          q.reject(respondata); 
+            }
+        });
+        return q.promise;
+    };
+
+    });	
+    
 }
 
 exports.login = function(request, response) {
+	console.log(request.body.reqContent)
 	var data=JSON.parse(request.body.reqContent);
-	console.log(data.reqBean);
-	console.log(data.reqBean.detail);
-	user.find({
-		phone: data.reqBean.detail.phone
-	}, function(e, docs) {
-		console.log(docs);
-		if(e){
-			respondata={
-				"code":"500",
-				"message":"exports"
-			};
-		}else if(docs.length>0){
-			respondata={
-				"code":"200",
-				"message":"success",
-				"docs":docs
-			};
-		}else{
-			respondata={
-				"code":"500",
-				"message":"exports",
-				"docs":docs
-			};
-		}
-		response.send(respondata);
-	});
+	console.log(data.reqBody)
+    var userpassword=md5.string.quiet(data.reqBody.password);
+    users.find({
+        phone:data.reqBody.phone
+    }, function(e, docs) {
+        if(e){
+                respondata={
+                    "code":"500",
+                    "message":"find error",
+                };
+                response.send(respondata);
+        }else{
+            console.log('docs:',docs);
+            if(docs&&docs.length>0){
+            	if(userpassword==docs[0].password){
+            		respondata={
+                    "code":"200",
+                    "message":"login success",
+                    "data":docs[0]
+                	};
+            	}else{
+            		respondata={
+                    "code":"500",
+                    "message":"password is wrong",
+                	};
+            	}
+                
+                response.send(respondata);
+            }else{
+               	respondata={
+                    "code":"500",
+                    "message":"the user is not exist",
+                };
+                response.send(respondata);
+            }
+            
+            
+        }
+        
+    });
 }
+//remove
+exports.removeUser = function(request, response) {
+    console.log(request.body);
+    var data=JSON.parse(request.body.reqContent);
+    users.update({
+        _id: data.reqBody.id
+    }, {
+            delstatus:true
+        },function(e) {
+        console.log(e);
+        if(e){
+            respondata={
+                "code":"500",
+                "message":"exports"
+            };
+        }else{
+            respondata={
+                "code":"200",
+                "message":"success"
+            };
+        }
+        
+        response.send(respondata);
+    });
+};
 exports.finduser=function(request, response){
 	console.log(request);
 	var data=JSON.parse(request.body.reqContent);
 	console.log(data.reqBean);
-	console.log(data.reqBean.detail);
-	// response.setHeader("Access-Control-Allow-Origin", "*");
-	// response.writeHead(200, {'Content-Type': 'text/json;charset=utf-8','Access-Control-Allow-Origin':'*'}); 
-	user.find({
-		_id: data.reqBean.detail.id
+	console.log(data.reqBody);
+	users.find({
+		_id: data.reqBody.id
 	}, function(e, docs) {
 		console.log(docs);
 		if(e){
@@ -110,7 +182,7 @@ exports.finduser=function(request, response){
 }
 exports.getuserpic=function(request, response){
 	console.log(request.params.username);
-	user.find({
+	users.find({
 		username: request.params.username
 	}, function(e, docs) {
 		console.log('userpic',docs);
@@ -141,15 +213,13 @@ exports.getuserpic=function(request, response){
 exports.personfile=function(request, response){
 	var data=JSON.parse(request.body.reqContent);
 	console.log(data.reqBean);
-	console.log(data.reqBean.detail);
-	// response.setHeader("Access-Control-Allow-Origin", "*");
-	// response.writeHead(200, {'Content-Type': 'text/json;charset=utf-8','Access-Control-Allow-Origin':'*'}); 
-	user.update({
-	_id: data.reqBean.detail.id
+	console.log(data.reqBody);
+	users.update({
+	_id: data.reqBody.id
 	}, {
-		username: data.reqBean.detail.username,
-		personfile: data.reqBean.detail,
-		updatetime:new Date().getTime()
+		username: data.reqBody.username,
+		personfile: data.reqBody,
+		updateTime:new Date().getTime()
 	}, function(e, numberAffected, raw) {
 		if(e){
 			respondata={

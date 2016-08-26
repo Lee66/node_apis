@@ -5,8 +5,8 @@ var circles = mongoose.model("circles", {
 	info: Object,
 	circlefile: Object,
 	member:Object,
-	time:String,
-	updatetime:String,
+	createTime:String,
+	updateTime:String,
 });
 
 var events = require("events");
@@ -20,9 +20,9 @@ var emitter = new events.EventEmitter();//创建了事件监听器的一个对�
 // },3000);
 exports.createcircles=function(request, response){
 	var data=JSON.parse(request.body.reqContent);
-	console.log(data.reqBean.detail);
+	console.log(data.reqBody);
 	circles.find({
-		circlesname: data.reqBean.detail.circlesname,
+		circlesname: data.reqBody.circlesname,
 	}, function(e, docs) {
 		console.log(docs);
 		if(docs&&docs.length>0){
@@ -34,12 +34,12 @@ exports.createcircles=function(request, response){
 			
 		}else{
 			var app6 = new circles({
-				owner: data.reqBean.detail.owner,
-				circlesname:data.reqBean.detail.circlesname,
-				info:data.reqBean.detail.info,
-				circlefile:data.reqBean.detail.circlefile,
-				time:new Date().getTime(),
-				updatetime:new Date().getTime()
+				owner: data.reqBody.owner,
+				circlesname:data.reqBody.circlesname,
+				info:data.reqBody.info,
+				circlefile:data.reqBody.circlefile,
+				createTime:new Date().getTime(),
+				updateTime:new Date().getTime()
 			});
 			app6.save(function(e, product, numberAffected) {
 				// if (e) response.send(e.message);
@@ -65,24 +65,24 @@ exports.createcircles=function(request, response){
 exports.joincircle=function(request, response){
 	var data=JSON.parse(request.body.reqContent);
 	circles.find({
-		_id: data.reqBean.detail.circleid,
+		_id: data.reqBody.circleid,
 	}, function(e, docs) {
 		console.log(docs);
 		var member=docs[0].member;
 		if(member){
-			console.log('users',member.indexOf(data.reqBean.detail.users));
-				if(member.indexOf(data.reqBean.detail.users)>=0){
+			console.log('users',member.indexOf(data.reqBody.users));
+				if(member.indexOf(data.reqBody.users)>=0){
 					respondata={
 						"code":"500",
 						"message":"exit"
 					};
 					response.send(respondata);
 				}else{
-					member.push(data.reqBean.detail.users);
+					member.push(data.reqBody.users);
 					doupdate(member);
 				}
 		}else{
-			member=[data.reqBean.detail.users];
+			member=[data.reqBody.users];
 			doupdate(member);
 		}
 		console.log(member);
@@ -91,7 +91,7 @@ exports.joincircle=function(request, response){
 	});
 	doupdate=function(member){
 			circles.update({
-			_id: data.reqBean.detail.circleid
+			_id: data.reqBody.circleid
 			}, {
 				member: member
 			}, function(e, numberAffected, raw) {
@@ -113,17 +113,17 @@ exports.joincircle=function(request, response){
 exports.circleList = function(request, response) {
 	console.log(request.body);
 	var data=JSON.parse(request.body.reqContent);
-	if(data.reqBean.detail.pageNum==1){
+	if(data.reqBody.pageNum==1){
 		var pageindex=0;//o biegin
 	}else{
-		var pageindex=(data.reqBean.detail.pageNum-1)*data.reqBean.detail.numPerPage;
+		var pageindex=(data.reqBody.pageNum-1)*data.reqBody.numPerPage;
 	}
 	var skips=pageindex;
-	var limit=data.reqBean.detail.numPerPage;
+	var limit=data.reqBody.numPerPage;
 	var totalRecord;
-	var owner=data.reqBean.detail.owner;
+	var owner=data.reqBody.owner;
 	if(owner&&owner!=null){
-		owner={'owner':data.reqBean.detail.owner}
+		owner={'owner':data.reqBody.owner}
 	}else{
 		owner={};
 	}
@@ -131,7 +131,7 @@ exports.circleList = function(request, response) {
 		totalRecord=docs.length;
 	});
 	console.log(skips+"/"+limit);
-	circles.find(owner,null,{skip:skips,limit:limit,sort:{"time":-1}},function(e, docs) {
+	circles.find(owner,null,{skip:skips,limit:limit,sort:{"createTime":-1}},function(e, docs) {
 		console.log(docs);
 		if(e){
 			respondata={
@@ -143,10 +143,10 @@ exports.circleList = function(request, response) {
 			respondata={
 				"code":"200",
 				"message":"success",
-				"docs":docs,
+				"data":docs,
 				"page":{
 				"totalRecord":totalRecord,
-				"pageIndex":data.reqBean.detail.pageNum,
+				"pageIndex":data.reqBody.pageNum,
 				"pageNum":limit,
 				}
 			};
@@ -161,11 +161,9 @@ exports.removecircles = function(request, response) {
 	console.log(request.body);
 	var data=JSON.parse(request.body.reqContent);
 	circles.remove({
-		_id: data.reqBean.detail.collectid
+		_id: data.reqBody.collectid
 	}, function(e) {
 		console.log(e);
-		// if (e) response.send(e.message);
-		// response.setHeader("Access-Control-Allow-Origin", "*")
 		if(e){
 			respondata={
 				"code":"500",

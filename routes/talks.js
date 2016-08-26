@@ -1,5 +1,5 @@
 var mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost/nodeapi");
+
 var fs = require('fs');
 var path = require('path');
 var Q= require('q');
@@ -8,32 +8,23 @@ var config=require('./config.js');
 // 新建一个数据模型
 // 参数1：数据表
 // 参数2：数据格式
-var article = mongoose.model("article", {
+var article = mongoose.model("talks", {
 	user:String,
 	tirtle: String,
-    info:String,
 	content:String,
- 	type:Object,
-	 typecode:String,
-    img_group:Object,
 	createTime:String,
     updateTime:String,
 	comment:Object,
 });
-var comments = mongoose.model("comments", {
+var comments = mongoose.model("talkcomments", {
 	user:String,
 	repayuser:String,
 	content: String,
 	createTime:String,
     updateTime:String
 });
-var articletype = mongoose.model("articletype", {
-	typename:String,
-	typecode:String,
-	typedes: String,
-	createTime:String,
-    updateTime:String
-});
+var events = require("events");
+var emitter = new events.EventEmitter();//创建了事件监听器的一个对象
 
 //创建文章
 exports.createArticle=function(request, response){
@@ -62,11 +53,7 @@ exports.createArticle=function(request, response){
     var app6 = new article({
       user:data.reqBody.user,
       tirtle: data.reqBody.tirtle,
-      info:data.reqBody.info,
-	  type:data.reqBody.type,
-	  typecode:data.reqBody.type.typecode,
       content:data.reqBody.content,
-      img_group:data.reqBody.img_group,
       createTime:new Date().getTime(),
       updateTime:new Date().getTime()
     });
@@ -92,7 +79,6 @@ exports.createArticle=function(request, response){
   function update(id){
     var arr=respon.checknull(data.reqBody)
     arr['updateTime']=new Date().getTime()
-		arr['typecode']=data.reqBody.type.typecode,
     console.log(arr)
     article.update({
 		  _id: id,
@@ -212,7 +198,7 @@ exports.MKcommit=function(request, response){
 			            "code":"200",
 			            "message":"update success"
 			          };
-					q.resolve(result);
+					q.resolve(respondata);
 				}
 				
 			});
@@ -220,7 +206,6 @@ exports.MKcommit=function(request, response){
 	}	
 
 };
-
 
 //文章列表
 exports.articleList= function(request, response) {
@@ -290,58 +275,9 @@ exports.ArticleDetail = function(request, response) {
 			
 		}
 
-
 	});
 };
 
-//文章列表
-exports.getallArticle= function(request, response) {
-	console.log(request.body);
-	console.log(request.params);
-		var data=request.params
-	console.log(data.pageNum);
-  if(parseInt(data.pageNum)==1){
-    var pageindex=0;//o biegin
-  }else{
-    var pageindex=(data.pageNum-1)*data.numPerPage;
-  }
-  var skips=pageindex;
-  var limit=parseInt(data.numPerPage);
-  var totalRecord;
-  var username=data.typecode;
-
-  if(username&&username!=null){
-    username={'typecode':data.typecode}
-  }else{
-    username={};
-  }
-	console.log(username)
-  article.find(username,function(e, docs) {
-    totalRecord=docs.length;
-    allpage=totalRecord/data.numPerPage
-    console.log('allpage',allpage,parseInt(allpage),data.numPerPage)
-    if(allpage>parseInt(allpage)){
-      allpage=parseInt(allpage)+1
-    }
-  });
-	console.log(skips,limit)
-	article.find(username,'_id tirtle info typecode type.typename type.typecode img_group.photopath  createTime',{skip:skips,limit:limit,sort:{"createTime":-1}},function(e, docs) {
-		var head={
-			"code":"200",
-			"message":"success",
-			"data":docs,
-			"page":{
-				 "totalRecord":totalRecord,
-                "pageIndex":parseInt(data.pageNum),
-                "pageNum":limit,
-                "allpage":allpage
-			}
-		};
-		// var html = JSON.stringify(head);
-		response.send(head);
-	});
-	// conn.close();
-};
 
 
 //home page getarticlelist
@@ -413,40 +349,7 @@ exports.getarticlelist= function(request, response) {
 
 
 
-//getArticle
-exports.getArticle = function(request, response) {
-	console.log(request.params.name);
-	article.find({
-		_id: request.params.name
-	}, function(e, docs) {
-		console.log(docs);
-		if(e){
-			respondata={
-				"code":"500",
-				"message":"exports"
-			};
-		}else{
-			// respondata={
-			// 	"code":"200",
-			// 	"message":"success",
-			// 	"data":docs
-			// };
-			respondata=docs[0].content
-		}
-		response.format({
-			'text/plain': function(){
-				response.send(respondata);
-			},
 
-			'text/html': function(){
-				var head='<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width"><title>home</title><style type="text/css">body{background:#fff;padding-bottom:10%}  img{width: 100%} h3{margin-bottom:0} p{margin:0} ul{list-style:none;margin:0;padding-left:5%}</style></head><body >'
-				response.send(head+respondata
-				+' </body></html>');
-			},
-		});
-
-	});
-};
 
 exports.delArticle = function(request, response) {
 	console.log(request.body);
@@ -474,101 +377,6 @@ exports.delArticle = function(request, response) {
 };
 
 
-//创建文章类型
-exports.createArticleType=function(request, response){
-  console.log(request.body.reqContent);
-	var data=JSON.parse(request.body.reqContent);
-  var q = Q.defer();
-
-  if(data.reqBody.type_id&&data.reqBody.type_id!=''){
-    update(data.reqBody.type_id).then(function(result){
-       console.log('type result',result)
-       response.send(result);
-    },function(error){
-        response.send(error);
-    });
-
-  }else{
-    create().then(function(result){
-       console.log('type result',result)
-       response.send(result);
-    },function(error){
-        response.send(error);
-    });
-
-  }
-  function create(){
-    var app6 = new articletype({
-      typename:data.reqBody.typename,
-      typecode:data.reqBody.typecode,
-      typedes: data.reqBody.typedes,
-      createTime:new Date().getTime(),
-      updateTime:new Date().getTime()
-    });
-    app6.save(function(e, product, numberAffected) {
-      // if (e) response.send(e.message);
-        console.log(product);
-        if(product){
-          respondata={
-            "code":"200",
-            "message":"success"
-          };
-          q.resolve(respondata);
-        }else{
-          respondata={
-            "code":"500",
-            "message":"exports"
-          };
-          q.reject(respondata);
-        }
-      });
-      return q.promise;
-  }
-  function update(id){
-    var arr=respon.checknull(data.reqBody)
-    arr['updateTime']=new Date().getTime()
-    console.log(arr)
-    articletype.update({
-		  _id: id,
-		}, arr, function(e, numberAffected, raw) {
-			if(e){
-        respondata={
-          "code":"500",
-          "message":"error"
-        };
-        q.reject(respondata);
-			}else{
-        respondata={
-          "code":"200",
-          "message":"success"
-        };
-        q.resolve(respondata);
-			}
-		});
-    return q.promise;
-  }
-
-}
 
 
-//articleTypeList
-exports.articleTypeList= function(request, response) {
-	console.log(request.body);
-		var data=JSON.parse(request.body.reqContent);
-  var username=data.reqBody.username;
-  if(username&&username!=null){
-    username={'username':data.reqBody.username}
-  }else{
-    username={};
-  }
-	articletype.find(username,null,{sort:{"createTime":-1}},function(e, docs) {
-		var head={
-			"code":"200",
-			"message":"success",
-			"data":docs,
-		};
-		var html = JSON.stringify(head);
-		response.send(html);
-	});
-	// conn.close();
-};
+
