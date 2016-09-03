@@ -100,3 +100,57 @@ exports.imgupload = function(request, response) {
 	    });
   }
 }
+
+
+exports.photoslist=function(request, response){
+    console.log(request.body);
+  var data=JSON.parse(request.body.reqContent);
+  console.log(data.reqBody.pageNum);
+  if(data.reqBody.pageNum==1){
+    var pageindex=0;//o biegin
+  }else{
+    var pageindex=(data.reqBody.pageNum-1)*data.reqBody.numPerPage;
+  }
+  var skips=pageindex;
+  var limit=data.reqBody.numPerPage;
+  var totalRecord,allpage;
+  var username=data.reqBody.username;
+
+  if(username&&username!=null){
+    username={'username':data.reqBody.username}
+  }else{
+    username={};
+  }
+  photos.find(username,function(e, docs) {
+    totalRecord=docs.length;
+    allpage=totalRecord/data.reqBody.numPerPage
+    console.log('allpage',allpage,parseInt(allpage),data.reqBody.numPerPage)
+    if(allpage>parseInt(allpage)){
+      allpage=parseInt(allpage)+1
+    }
+  });
+
+  photos.find(username,null,{skip:skips,limit:limit,sort:{"createTime":-1}}, function(e, docs) {
+    //console.log(docs);
+    if(e){
+      respondata={
+        "code":"500",
+        "message":"exports"
+      };
+    }else{
+      respondata={
+        "code":"200",
+        "message":"success",
+        "data":docs,
+        "page":{
+        "totalRecord":docs.length,
+        "pageIndex":data.reqBody.pageNum,
+        "pageNum":limit,
+        "allpage":allpage
+        }
+      };
+      respondata = JSON.stringify(respondata);
+    }
+    response.send(respondata);
+  });
+}

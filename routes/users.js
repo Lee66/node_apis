@@ -123,6 +123,143 @@ exports.login = function(request, response) {
         
     });
 }
+//创建文章
+exports.createUser=function(request, response){
+  console.log(request.body.reqContent);
+	var data=JSON.parse(request.body.reqContent);
+  var q = Q.defer();
+
+  if(data.reqBody.art_id&&data.reqBody.art_id!=''){
+    update(data.reqBody.art_id).then(function(result){
+       console.log('type result',result)
+       response.send(result);
+    },function(error){
+        response.send(error);
+    });
+
+  }else{
+    create().then(function(result){
+       console.log('type result',result)
+       response.send(result);
+    },function(error){
+        response.send(error);
+    });
+
+  }
+  function create(){
+    var app6 = new  users({
+            username:data.reqBody.username,
+            password:md5.string.quiet(data.reqBody.password),
+            phone:data.reqBody.phone,
+            email: data.reqBody.email,
+            type:data.reqBody.type,
+            personfile:data.reqBody.personfile,
+			typecode:data.reqBody.type.typecode,
+            createTime:new Date().getTime(),
+            updateTime:new Date().getTime(),
+        });
+    app6.save(function(e, product, numberAffected) {
+      // if (e) response.send(e.message);
+        console.log(product);
+        if(product){
+          respondata={
+            "code":"200",
+            "message":"success"
+          };
+          q.resolve(respondata);
+        }else{
+          respondata={
+            "code":"500",
+            "message":"exports"
+          };
+          q.reject(respondata);
+        }
+      });
+      return q.promise;
+  }
+  function update(id){
+    var arr=respon.checknull(data.reqBody)
+    arr['updateTime']=new Date().getTime()
+    if(data.reqBody.password){
+          arr['password']=md5.string.quiet(data.reqBody.password)
+    }
+	arr['typecode']=data.reqBody.type.typecode;
+    console.log(arr)
+    users.update({
+		  _id: id,
+		}, arr, function(e, numberAffected, raw) {
+			if(e){
+        respondata={
+          "code":"500",
+          "message":"error"
+        };
+        q.reject(respondata);
+			}else{
+        respondata={
+          "code":"200",
+          "message":"success"
+        };
+        q.resolve(respondata);
+			}
+		});
+    return q.promise;
+  }
+
+}
+
+//userlist
+exports.userlist=function(request, response){
+    console.log(request.body);
+	var data=JSON.parse(request.body.reqContent);
+	console.log(data.reqBody.pageNum);
+  if(data.reqBody.pageNum==1){
+    var pageindex=0;//o biegin
+  }else{
+    var pageindex=(data.reqBody.pageNum-1)*data.reqBody.numPerPage;
+  }
+  var skips=pageindex;
+  var limit=data.reqBody.numPerPage;
+  var totalRecord,allpage;
+  var username=data.reqBody.username;
+
+  if(username&&username!=null){
+    username={'username':data.reqBody.username}
+  }else{
+    username={};
+  }
+  users.find(username,function(e, docs) {
+    totalRecord=docs.length;
+    allpage=totalRecord/data.reqBody.numPerPage
+    console.log('allpage',allpage,parseInt(allpage),data.reqBody.numPerPage)
+    if(allpage>parseInt(allpage)){
+      allpage=parseInt(allpage)+1
+    }
+  });
+
+  users.find(username,null,{skip:skips,limit:limit,sort:{"createTime":-1}}, function(e, docs) {
+    //console.log(docs);
+    if(e){
+      respondata={
+        "code":"500",
+        "message":"exports"
+      };
+    }else{
+      respondata={
+        "code":"200",
+        "message":"success",
+        "data":docs,
+        "page":{
+        "totalRecord":docs.length,
+        "pageIndex":data.reqBody.pageNum,
+        "pageNum":limit,
+        "allpage":allpage
+        }
+      };
+      respondata = JSON.stringify(respondata);
+    }
+    response.send(respondata);
+  });
+}
 //remove
 exports.removeUser = function(request, response) {
     console.log(request.body);
@@ -237,4 +374,104 @@ exports.personfile=function(request, response){
 
 	
 }
+
+
+//创建文章类型
+exports.createUserType=function(request, response){
+  console.log(request.body.reqContent);
+	var data=JSON.parse(request.body.reqContent);
+  var q = Q.defer();
+
+  if(data.reqBody.type_id&&data.reqBody.type_id!=''){
+    update(data.reqBody.type_id).then(function(result){
+       console.log('type result',result)
+       response.send(result);
+    },function(error){
+        response.send(error);
+    });
+
+  }else{
+    create().then(function(result){
+       console.log('type result',result)
+       response.send(result);
+    },function(error){
+        response.send(error);
+    });
+
+  }
+  function create(){
+    var app6 = new usertype({
+      typename:data.reqBody.typename,
+      typecode:data.reqBody.typecode,
+      typedes: data.reqBody.typedes,
+      createTime:new Date().getTime(),
+      updateTime:new Date().getTime()
+    });
+    app6.save(function(e, product, numberAffected) {
+      // if (e) response.send(e.message);
+        console.log(product);
+        if(product){
+          respondata={
+            "code":"200",
+            "message":"success"
+          };
+          q.resolve(respondata);
+        }else{
+          respondata={
+            "code":"500",
+            "message":"exports"
+          };
+          q.reject(respondata);
+        }
+      });
+      return q.promise;
+  }
+  function update(id){
+    var arr=respon.checknull(data.reqBody)
+    arr['updateTime']=new Date().getTime()
+    console.log(arr)
+    usertype.update({
+		  _id: id,
+		}, arr, function(e, numberAffected, raw) {
+			if(e){
+        respondata={
+          "code":"500",
+          "message":"error"
+        };
+        q.reject(respondata);
+			}else{
+        respondata={
+          "code":"200",
+          "message":"success"
+        };
+        q.resolve(respondata);
+			}
+		});
+    return q.promise;
+  }
+
+}
+
+
+//articleTypeList
+exports.usertypeList= function(request, response) {
+	console.log(request.body);
+		var data=JSON.parse(request.body.reqContent);
+  var username=data.reqBody.username;
+  if(username&&username!=null){
+    username={'username':data.reqBody.username}
+  }else{
+    username={};
+  }
+	usertype.find(username,null,{sort:{"createTime":-1}},function(e, docs) {
+		var head={
+			"code":"200",
+			"message":"success",
+			"data":docs,
+		};
+		var html = JSON.stringify(head);
+		response.send(html);
+	});
+	// conn.close();
+};
 ;

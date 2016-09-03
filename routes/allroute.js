@@ -18,8 +18,17 @@ router.post("/finduser", users.finduser);
 router.post("/personfile", users.personfile);
 router.get("/getuserpic/:username",users.getuserpic);
 
+//manger users
+router.post("/userlist", users.userlist);
+router.post("/createUser", users.createUser);
+router.post("/createUserType", users.createUserType);
+router.post("/usertypelist", users.usertypeList);
+
+
 router.post("/imgupload",multipartMiddleware,photos.imgupload);
 router.get("/getphoto/:photoname",photos.getphoto);
+//media
+router.post("/photoslist",photos.photoslist);
 //article
 
 router.post("/createArticle", article.createArticle);
