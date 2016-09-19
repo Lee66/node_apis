@@ -1,0 +1,36 @@
+接口文档查询接口
+网络通讯格式json
+发送
+reqObj:{
+	reqHead:{
+		api:url,
+		headers:
+	}
+	reqBody:{
+
+	}
+}
+返回
+respObj:{
+ 	respHead:{
+ 		code:200,404,500
+ 		message:
+ 	}
+ 	respBody:[
+     {time:'2015-6-6',
+      data:[{
+        id:'sx10',//业务编号
+        name:'XXX',//业务名称
+        money:'500000',//交易金额
+        cont:'1000'//交易笔数
+        },
+        {
+          id:'sx10',//业务编号
+          name:'XXX',//业务名称
+          money:'500000',
+          cont:'1000'
+        },...]
+      },
+      {time:'2015-6-7',data:[{},{}]},...
+  ]
+}

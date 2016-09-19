@@ -1,7 +1,7 @@
 exports.appconfig={
 	'islog':true,
 	'api':'www.wetalks.cn',
-	'urlapi':'http://192.180.3.82:8002/'
+	'urlapi':'http://media.jfpal.com/'
 }
 exports.status={
 	UNPUBLIC:"UNPUBLIC",

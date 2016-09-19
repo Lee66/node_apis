@@ -1,27 +1,63 @@
-var express = require('express');
-var bodyParser = require("body-parser");
-var path = require('path');
-var app = express();
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.listen(2016);
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(function (request, response, next) {
-    response.setHeader("Access-Control-Allow-Origin", "*");
-    // Website you wish to allow to connect
-    // response.setHeader('Access-Control-Allow-Origin', 'http://localhost:8888');
-    // // Request methods you wish to allow
-    // response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    // // Request headers you wish to allow
-    // response.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    // // Set to true if you need the website to include cookies in the requests sent
-    // // to the API (e.g. in case you use sessions)
-    // response.setHeader('Access-Control-Allow-Credentials', true);
-    // Pass to next layer of middleware
-    next();
+var app = require('express')();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+
+app.get('/', function(req, res){
+	res.send('<h1>Welcome Realtime Server</h1>');
 });
-//allroutes
-var allroute=require("./routes/allroute.js");
-app.use('/',allroute);
-//article
+
+//在线用户
+var onlineUsers = {};
+//当前在线人数
+var onlineCount = 0;
+
+io.on('connection', function(socket){
+	console.log('a user connected');
+
+	//监听新用户加入
+	socket.on('login', function(obj){
+		//将新加入用户的唯一标识当作socket的名称，后面退出的时候会用到
+		socket.name = obj.userid;
+
+		//检查在线列表，如果不在里面就加入
+		if(!onlineUsers.hasOwnProperty(obj.userid)) {
+			onlineUsers[obj.userid] = obj.username;
+			//在线人数+1
+			onlineCount++;
+		}
+
+		//向所有客户端广播用户加入
+		io.emit('login', {onlineUsers:onlineUsers, onlineCount:onlineCount, user:obj});
+		console.log(obj.username+'加入了聊天室');
+	});
+
+	//监听用户退出
+	socket.on('disconnect', function(){
+		//将退出的用户从在线列表中删除
+		if(onlineUsers.hasOwnProperty(socket.name)) {
+			//退出用户的信息
+			var obj = {userid:socket.name, username:onlineUsers[socket.name]};
+
+			//删除
+			delete onlineUsers[socket.name];
+			//在线人数-1
+			onlineCount--;
+
+			//向所有客户端广播用户退出
+			io.emit('logout', {onlineUsers:onlineUsers, onlineCount:onlineCount, user:obj});
+			console.log(obj.username+'退出了聊天室');
+		}
+	});
+
+	//监听用户发布聊天内容
+	socket.on('message', function(obj){
+		//向所有客户端广播发布的消息
+		io.emit('message', obj);
+		console.log(obj.username+'说：'+obj.content);
+	});
+
+});
+
+http.listen(3000, function(){
+	console.log('listening on *:3000');
+});

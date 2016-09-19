@@ -1,16 +1,28 @@
 var mongoose = require("mongoose");
 var md5=require("nodejs-md5");
 var Q= require('q');
+var respon=require('./respon.js');
+var config=require('./config.js');
 // 新建一个数据模型
 // 参数1：数据表
 // 参数2：数据格式
 var users = mongoose.model("user", {
 	username:String,
 	phone:String,
+    email:String,
+    type:Object,
+    typecode:String,
 	password: String,
 	personfile:Object,
 	createTime:String,
 	updateTime:String
+});
+var usertype = mongoose.model("usertype", {
+	typename:String,
+	typecode:String,
+	typedes: String,
+	createTime:String,
+    updateTime:String
 });
 var path = require('path');
 
@@ -31,7 +43,7 @@ exports.register = function(request, response) {
             if(docs&&docs.length>0){
                 respondata={
                     "code":"200",
-                    "message":"the emial has bean used",
+                    "message":"the email has bean used",
                 };
                 response.send(respondata);
             }else{
@@ -51,7 +63,7 @@ exports.register = function(request, response) {
             username:data.reqBody.username,
             password:md5.string.quiet(data.reqBody.password),
             phone:data.reqBody.phone,
-            emial: data.reqBody.emial,
+            email: data.reqBody.email,
             createTime:new Date().getTime(),
             updateTime:new Date().getTime(),
         });
@@ -85,7 +97,7 @@ exports.login = function(request, response) {
 	console.log(data.reqBody)
     var userpassword=md5.string.quiet(data.reqBody.password);
     users.find({
-        phone:data.reqBody.phone
+        email:data.reqBody.email
     }, function(e, docs) {
         if(e){
                 respondata={
@@ -117,8 +129,6 @@ exports.login = function(request, response) {
                 };
                 response.send(respondata);
             }
-            
-            
         }
         
     });
@@ -260,6 +270,7 @@ exports.userlist=function(request, response){
     response.send(respondata);
   });
 }
+
 //remove
 exports.removeUser = function(request, response) {
     console.log(request.body);
@@ -374,7 +385,7 @@ exports.personfile=function(request, response){
 
 	
 }
-
+;
 
 //创建文章类型
 exports.createUserType=function(request, response){
@@ -474,4 +485,3 @@ exports.usertypeList= function(request, response) {
 	});
 	// conn.close();
 };
-;
