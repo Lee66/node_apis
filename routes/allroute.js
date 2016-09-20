@@ -8,6 +8,9 @@ var users=require("./users.js");
 var downcount=require("./downcount.js");
 var collects=require("./collects.js");
 var circle=require("./circle.js");
+var applications=require("./applications.js");
+var versions=require("./versions.js");
+var whitelist=require("./whitelist.js");
 var router=express.Router();
 var multipart = require('connect-multiparty');
 var multipartMiddleware = multipart();
@@ -39,6 +42,9 @@ router.post("/DelArticle", article.delArticle);
 router.post("/createArticleType", article.createArticleType);
 router.post("/articletypelist", article.articleTypeList);
 
+router.get("/getarticle/:name",article.getArticle);
+
+
 router.post("/createTalks", talks.createArticle);
 router.post("/TalksList", talks.articleList);
 router.post("/TalksDetail", talks.ArticleDetail);
@@ -59,6 +65,30 @@ router.post("/mycollect",collects.find);
 router.post("/createcircles",circle.createcircles);
 router.post("/circleList",circle.circleList);
 router.post("/joincircle",circle.joincircle);
+
+//applications
+router.post("/applicationlist",applications.applist);
+router.post("/createApp",applications.createApp);
+router.post("/imgupload",multipartMiddleware,applications.imgupload);
+router.get("/getphoto/:photoname",applications.getphoto);
+router.get("/moduleListHome",applications.getpreapplistHome);
+// router.get("/moduleListHome/:phone",applications.getpreapplistHome);
+router.get("/moduleList",applications.getpreapplist);
+// router.get("/moduleList/:phone",applications.getpreapplist);
+router.get("/moduleDetail/:modelname",applications.getpreappDetail);
+router.post("/changeAppStatus",applications.changeAppStatus);
+
+//versions
+router.post("/versionlist",versions.versionlist);
+router.post("/createVersion",versions.createVersion);
+router.post("/fileupload",multipartMiddleware,versions.fileupload);
+router.post("/changeVersionStatus",versions.changeVersionStatus);
+
+router.post("/removeVersion",versions.removeVersion);
+
+//whitelist
+router.post("/createWhite", whitelist.createWhite);
+router.post("/whitelist", whitelist.whiteList);
 
 router.get("/*", index.notfond);
 
