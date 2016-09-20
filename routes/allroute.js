@@ -69,8 +69,7 @@ router.post("/joincircle",circle.joincircle);
 //applications
 router.post("/applicationlist",applications.applist);
 router.post("/createApp",applications.createApp);
-router.post("/imgupload",multipartMiddleware,applications.imgupload);
-router.get("/getphoto/:photoname",applications.getphoto);
+
 router.get("/moduleListHome",applications.getpreapplistHome);
 // router.get("/moduleListHome/:phone",applications.getpreapplistHome);
 router.get("/moduleList",applications.getpreapplist);
