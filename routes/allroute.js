@@ -11,6 +11,7 @@ var circle=require("./circle.js");
 var applications=require("./applications.js");
 var versions=require("./versions.js");
 var whitelist=require("./whitelist.js");
+var video=require("./video.js");
 var router=express.Router();
 var multipart = require('connect-multiparty');
 var multipartMiddleware = multipart();
@@ -88,6 +89,14 @@ router.post("/removeVersion",versions.removeVersion);
 //whitelist
 router.post("/createWhite", whitelist.createWhite);
 router.post("/whitelist", whitelist.whiteList);
+
+//videos
+//versions
+router.post("/videoList",video.videosList);
+router.post("/createVideo",video.createVideo);
+router.post("/removeVideo",video.removeVideo);
+router.post("/videoUpload",multipartMiddleware,video.videoupload);
+
 
 router.get("/*", index.notfond);
 
