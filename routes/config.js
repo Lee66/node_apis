@@ -1,7 +1,7 @@
 exports.appconfig={
 	'islog':true,
 	'api':'www.wetalks.cn',
-	'urlapi':'http://192.168.1.12:8002/'
+	'urlapi':'http://47.88.2.72:2016/'
 }
 exports.status={
 	UNPUBLIC:"UNPUBLIC",
