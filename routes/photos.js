@@ -30,6 +30,7 @@ exports.imgupload = function(request, response) {
       var extension_name = "";
       //移动到指定的目录，一般放到public的images文件下面
       //在移动的时候确定路径已经存在，否则会报错
+      var theData=new Date()
       var tmp_name = (Date.parse(new Date())/1000);
       tmp_name = tmp_name+''+(Math.round(Math.random()*9999));
       //判断文件类型
@@ -49,11 +50,23 @@ exports.imgupload = function(request, response) {
             case 'application/zip':extension_name='zip';
             break;
         }
+        var targetPaths=theData.getFullYear()+'-'+( theData.getMonth()+1)+'-'+theData.getDate();
+        //the path is exist
+        var folder_exists = fs.existsSync('uploads/' +targetPaths);
+        if(folder_exists == true){
+        }else{
+          fs.mkdir('uploads/'+targetPaths,function(err){
+            if (err) {
+                   return console.error(err);
+               }
+             console.log("目录创建成功。");
+          });
+        }
         var tmp_name = tmp_name+'.'+extension_name;
-        var targetPath = 'uploads/' + tmp_name;//public/images/
-        console.log(tmpPath);
+        targetPath = targetPaths+ '/'+tmp_name;//public/images/
+        console.log(tmpPath,targetPaths);
         //将上传的临时文件移动到指定的目录下
-        fs.rename(tmpPath, targetPath , function(err) {
+        fs.rename(tmpPath, 'uploads/'+targetPath , function(err) {
             if(err){
                 throw err;
             }
@@ -71,7 +84,7 @@ exports.imgupload = function(request, response) {
 
 	      	var theproduct = new photos({
       			photoname:tmp_name,
-      			photopath:config.appconfig.urlapi+targetPath,
+      			photopath:targetPath,
       			content: tmp_name+tmpPath,
       			createTime:new Date().getTime(),
       		});

@@ -13,6 +13,7 @@ var videos = mongoose.model("videos", {
   code:Object,
   code_size:String,
   img_group:Object,
+  img_url:String,
   createTime:String,
   updateTime:String
 });
@@ -50,6 +51,7 @@ function create(){
       videos_name:data.reqBody.videos_name,
 	  videos_des:data.reqBody.videos_des,
 	  link_url:data.reqBody.link_url,
+	  img_url:data.reqBody.img_url,
 	  info:data.reqBody.info,
 	  code:data.reqBody.code,
       code_size:data.reqBody.code_size,
@@ -180,6 +182,11 @@ exports.videosList= function(request, response) {
     }
   });
 	videos.find(username,null,{skip:skips,limit:limit,sort:{"createTime":-1}},function(e, docs) {
+		for(var i=0;i<docs.length;i++)
+	    {
+			docs[i].link_url=config.appconfig.urlapi+docs[i].link_url
+			docs[i].img_url=config.appconfig.urlapi+docs[i].img_url
+	    }
 		var head={
 			"code":"200",
 			"message":"success",
