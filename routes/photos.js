@@ -19,6 +19,15 @@ exports.getphoto=function(request, response){
 	response.sendfile(filePath);
 }
 
+exports.getphotoPal=function(request, response){
+  console.log(request.params.photopath);
+  var photoname=request.params.photoname;
+  var photopath=request.params.photopath;
+  var filePath='./uploads/'+photopath+'/'+photoname;
+
+  response.sendfile(filePath);
+}
+
 exports.imgupload = function(request, response) {
 	// var data=JSON.parse(request);
 	console.log( request.files);

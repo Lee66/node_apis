@@ -31,6 +31,8 @@ router.post("/usertypelist", users.usertypeList);
 
 router.post("/imgupload",multipartMiddleware,photos.imgupload);
 router.get("/getphoto/:photoname",photos.getphoto);
+router.get("/getphotoPal/:photopath/:photoname",photos.getphotoPal);
+
 //media
 router.post("/photoslist",photos.photoslist);
 //article
