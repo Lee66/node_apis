@@ -331,9 +331,9 @@ exports.getuserpic=function(request, response){
 			response.send(respondata);
 		}else if(docs.length>0){
 			if(docs[0].personfile){
-				var photoname=docs[0].personfile.personimg.photoname;
+				var photopath=docs[0].personfile.personimg.photopath;
 			targetPath='./uploads/';
-			var filePath=path.join(targetPath,photoname);
+			var filePath=path.join(targetPath,photopath);
 			response.sendfile(filePath);
 			}else{
 				respondata={
