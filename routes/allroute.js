@@ -71,7 +71,7 @@ router.post("/circleList",circle.circleList);
 router.post("/joincircle",circle.joincircle);
 
 //applications
-router.post("/applicationlist",applications.applist);
+router.post("/applicationlist",applications.newapplist);
 router.post("/createApp",applications.createApp);
 
 router.get("/moduleListHome",applications.getpreapplistHome);

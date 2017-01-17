@@ -678,6 +678,80 @@ exports.applist=function(request, response){
   });
 }
 
+exports.newapplist=function(request, response){
+  console.log(request.body);
+	var data=JSON.parse(request.body.reqContent);
+	console.log(data);
+  if(data.reqBody.pageNum==1){
+    var pageindex=0;//o biegin
+  }else{
+    var pageindex=(data.reqBody.pageNum-1)*data.reqBody.numPerPage;
+  }
+  var skips=pageindex;
+  var limit=data.reqBody.numPerPage;
+  var totalRecord,allpage;
+  var username=data.reqBody.username;
+
+  if(username&&username!=null){
+    username={'username':data.reqBody.username}
+  }else{
+    username={};
+  }
+  application.find(username,function(e, docs) {
+    totalRecord=docs.length;
+    allpage=totalRecord/data.reqBody.numPerPage
+    console.log('allpage',allpage,parseInt(allpage),data.reqBody.numPerPage)
+    if(allpage>parseInt(allpage)){
+      allpage=parseInt(allpage)+1
+    }
+  });
+
+  application.find(username,null,{skip:skips,limit:limit,sort:{"createTime":-1}}, function(e, docs) {
+    //console.log(docs);
+    if(e){
+      respondata={
+        "code":"500",
+        "message":"exports"
+      };
+    }else{
+      var newarr=[]
+      for(var i=0;i<docs.length;i++)
+      {
+        var arr= {
+        "_id" :docs[i]._id,
+        'module_code':docs[i].module_code,
+        'module_des':docs[i].module_des,
+        'module_name':docs[i].module_name,
+        'module_path':docs[i].module_path,
+        'module_status':docs[i].module_status,
+        'module_type':docs[i].module_type,
+        'icon':docs[i].icon,
+        'iconUrl':config.appconfig.imgapi+'getphotoPal/'+docs[i].icon.photopath,
+        'img_group':docs[i].img_group,
+        'preversion':docs[i].preversion,
+        'version':docs[i].version,
+        'updateTime':docs[i].updateTime,
+        'createTime':docs[i].createTime,
+        }
+        newarr[i]=arr
+     }
+      respondata={
+        "code":"200",
+        "message":"success",
+        "data":newarr,
+        "page":{
+        "totalRecord":totalRecord,
+        "pageIndex":data.reqBody.pageNum,
+        "pageNum":limit,
+        "allpage":allpage
+        }
+      };
+      respondata = JSON.stringify(respondata);
+    }
+    response.send(respondata);
+  });
+}
+
 // 删除应用
 exports.removeApp=function(request, response){
   respon.loggers(request.body);

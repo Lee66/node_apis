@@ -319,6 +319,7 @@ exports.versionlist=function(request, response){
         'system_type':docs[i].system_type,
         'version_status':docs[i].version_status,
         'version_type':docs[i].version_type,
+        'version_des':docs[i].version_des,
         'downloadUrl':config.appconfig.urlapi+docs[i].code.filepath,
         'code_size':docs[i].code_size,
         'code':docs[i].code,
@@ -330,7 +331,7 @@ exports.versionlist=function(request, response){
       respondata={
         "code":"200",
         "message":"success",
-        "docs":newarr,
+        "data":newarr,
         "page":{
         "totalRecord":docs.length,
         "pageIndex":data.reqBody.pageNum,
@@ -398,6 +399,9 @@ exports.fileupload = function(request, response) {
 	console.log( request.files);
 
 	var item=request.files.file;
+  var theData=new Date();
+  var tmp_name = (Date.parse(new Date())/1000);
+      tmp_name = tmp_name+''+(Math.round(Math.random()*9999));
     if(item.path){
       var tmpPath = item.path;
       var type = item.type;
@@ -428,9 +432,9 @@ exports.fileupload = function(request, response) {
   			var filename;
   			if(docs&&docs.length>0){
   				console.log('exict');
-  				filename=name[0]+'_'+(parseFloat(docs[0].version_number)+0.1).toFixed(1)+'.'+name[1];
+  				filename=name[0]+'-'+tmp_name+'.'+name[1];
   			}else{
-  				filename=name[0]+'_1'+'.'+name[1];
+  				filename=name[0]+'-'+tmp_name+'.'+name[1];
   			}
   			console.log(filename);
            movefile(filename,targetPaths,tmpPath).then(function(result){
