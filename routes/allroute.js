@@ -33,6 +33,7 @@ router.post("/imgupload",multipartMiddleware,photos.imgupload);
 router.get("/getphoto/:photoname",photos.getphoto);
 router.get("/getphotoPal/:photopath/:photoname",photos.getphotoPal);
 
+
 //media
 router.post("/photoslist",photos.photoslist);
 //article
@@ -75,18 +76,32 @@ router.post("/createApp",applications.createApp);
 
 router.get("/moduleListHome",applications.getpreapplistHome);
 // router.get("/moduleListHome/:phone",applications.getpreapplistHome);
-router.get("/moduleList",applications.getpreapplist);
+
+// router.get("/moduleList",applications.getpreapplist);
+router.get("/moduleList",applications.getapplist);
+
+router.get("/versionList/:appUser",versions.getVersionList);
+
+
 // router.get("/moduleList/:phone",applications.getpreapplist);
 router.get("/moduleDetail/:modelname",applications.getpreappDetail);
 router.post("/changeAppStatus",applications.changeAppStatus);
+
+router.post("/removeApp",applications.removeApp);
 
 //versions
 router.post("/versionlist",versions.versionlist);
 router.post("/createVersion",versions.createVersion);
 router.post("/fileupload",multipartMiddleware,versions.fileupload);
 router.post("/changeVersionStatus",versions.changeVersionStatus);
+router.get("/getfilePal/:photoname",versions.getfilePal);
+
+
 
 router.post("/removeVersion",versions.removeVersion);
+
+router.post("/createVersionType", versions.createVersionType);
+router.post("/Versiontypelist", versions.versionTypeList);
 
 //whitelist
 router.post("/createWhite", whitelist.createWhite);

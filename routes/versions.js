@@ -13,6 +13,10 @@ var versions = mongoose.model("versions", {
 	code:Object,
   code_size:String,
   version_status:String,
+  system_type:String,
+  version_type:Object,
+  version_typeName:String,
+  version_typeCode:String,
   createTime:String,
   updateTime:String
 });
@@ -23,6 +27,14 @@ var files = mongoose.model("files", {
   size:String,
 	content: String,
 	createTime:String
+});
+
+var versiontype = mongoose.model("versiontype", {
+  typename:String,
+  typecode:String,
+  typedes: String,
+  createTime:String,
+  updateTime:String
 });
 //版本 status  未发布 UNPUBLIC 预览版 PREVIEW 已发布 PUBLIC
 //应用 status  未发布 UNPUBLIC 已发布 PUBLIC 已下架 UNSHELVE
@@ -60,6 +72,10 @@ exports.createVersion=function(request, response){
     	code:data.reqBody.code,
       code_size:data.reqBody.code_size,
       version_status:config.status.UNPUBLIC,
+      system_type:data.reqBody.system_type,
+      version_type:data.reqBody.version_type,
+      version_typeName:data.reqBody.version_typeName,
+      version_typeCode:data.reqBody.version_type.typecode,
       createTime:new Date().getTime(),
       updateTime:new Date().getTime()
     });
@@ -266,14 +282,15 @@ exports.versionlist=function(request, response){
   var skips=pageindex;
   var limit=data.reqBody.numPerPage;
   var totalRecord,allpage;
-  var username=data.reqBody.username;
 
-  if(username&&username!=null){
-    username={'username':data.reqBody.username}
-  }else{
-    username={};
+  var surch={
+    'version_typeCode':data.reqBody.version_type,
+    'system_type':data.reqBody.system_type,
+    'belong':data.reqBody.belong,
   }
-  versions.find(username,function(e, docs) {
+  surch=respon.checknull(surch)
+  console.log('surch',surch)
+  versions.find(surch,function(e, docs) {
     totalRecord=docs.length;
     allpage=totalRecord/data.reqBody.numPerPage
     console.log('allpage',allpage,parseInt(allpage),data.reqBody.numPerPage)
@@ -282,7 +299,7 @@ exports.versionlist=function(request, response){
     }
   });
 
-  versions.find(username,null,{skip:skips,limit:limit,sort:{"createTime":-1}}, function(e, docs) {
+  versions.find(surch,null,{skip:skips,limit:limit,sort:{"createTime":-1}}, function(e, docs) {
     //console.log(docs);
     if(e){
       respondata={
@@ -290,10 +307,30 @@ exports.versionlist=function(request, response){
         "message":"exports"
       };
     }else{
+      var newarr=[]
+      for(var i=0;i<docs.length;i++)
+      {
+        var arr= {
+        '_id':docs[i]._id,
+        'version_name':docs[i].version_name,
+        'version_number':docs[i].version_number,
+        'version_typeCode':docs[i].version_typeCode,
+        'belong':docs[i].belong,
+        'system_type':docs[i].system_type,
+        'version_status':docs[i].version_status,
+        'version_type':docs[i].version_type,
+        'downloadUrl':config.appconfig.urlapi+docs[i].code.filepath,
+        'code_size':docs[i].code_size,
+        'code':docs[i].code,
+        'createTime':docs[i].createTime,
+        'updateTime':docs[i].updateTime,
+        }
+        newarr[i]=arr
+      }
       respondata={
         "code":"200",
         "message":"success",
-        "docs":docs,
+        "docs":newarr,
         "page":{
         "totalRecord":docs.length,
         "pageIndex":data.reqBody.pageNum,
@@ -303,6 +340,54 @@ exports.versionlist=function(request, response){
       };
       respondata = JSON.stringify(respondata);
     }
+    response.send(respondata);
+  });
+}
+
+exports.getfilePal=function(request, response){
+  console.log(request.params.photopath);
+  var photoname=request.params.photoname;
+  var filePath='./'+photoname;
+  response.sendfile(filePath);
+}
+
+//production //preproduction //test
+exports.getVersionList=function(request, response){
+  console.log(request.body);
+  var appUser=request.params.appUser;
+  console.log(appUser);
+  versions.find({'belong':appUser},null,{sort:{"createTime":-1}}, function(e, docs) {
+    var newarr={};
+    newarr['production']=[]
+    newarr['preproduction']=[]
+    newarr['test']=[]
+    for(var i=0;i<docs.length;i++)
+    {
+      console.log(docs[i].version_typeCode)
+      if(docs[i].version_typeCode=='production'){
+       newarr['production'].push(docs[i])
+      }
+      else if(docs[i].version_typeCode=='preproduction'){
+       newarr['preproduction'].push(docs[i])
+      }
+      else if(docs[i].version_typeCode=='test'){
+       newarr['test'].push(docs[i])
+      }
+    }
+    if(e){
+      respondata={
+        "code":"500",
+        "message":"exports"
+      };
+    }else{
+      respondata={
+        "code":"200",
+        "message":"success",
+        "docs":newarr,
+      };
+      
+    }
+    console.log(newarr)
     response.send(respondata);
   });
 }
@@ -418,7 +503,7 @@ function creatfile(filename,targetPath,tmpPath){
   var q =new Q.defer();
   var theproduct = new files({
     filename:filename,
-    filepath:config.appconfig.urlapi+targetPath,
+    filepath:targetPath,
     content: filename+tmpPath,
     createTime:new Date().getTime(),
   });
@@ -448,13 +533,13 @@ function creatfile(filename,targetPath,tmpPath){
 exports.removeVersion=function(request, response){
   respon.loggers(request.body);
   var data=JSON.parse(request.body.reqContent);
-  versions.update({
-      version_number: data.reqBody.version_number
-  }, {
-    version_status:'DELETE'
-  },function(e) {
-      respon.loggers(e);
-      if(e){
+  versions.remove({
+    _id: data.reqBody.id
+  }, function(e) {
+    console.log(e);
+    // if (e) response.send(e.message);
+    // response.setHeader("Access-Control-Allow-Origin", "*")
+    if(e){
         var respondata={
           "code":"500",
           "message":"error"
@@ -468,6 +553,127 @@ exports.removeVersion=function(request, response){
         response.send(respondata);
         // respon.pushdata("0000","success")
       }
-
+    
+    response.send(respondata);
   });
+  // versions.update({
+  //     version_number: data.reqBody.version_number
+  // }, {
+  //   version_status:'DELETE'
+  // },function(e) {
+  //     respon.loggers(e);
+  //     if(e){
+  //       var respondata={
+  //         "code":"500",
+  //         "message":"error"
+  //       };
+  //         response.send(respondata);
+  //     }else{
+  //       var respondata={
+  //         "code":"0000",
+  //         "message":"success",
+  //       };
+  //       response.send(respondata);
+  //       // respon.pushdata("0000","success")
+  //     }
+
+  // });
 }
+
+//创建文章类型
+exports.createVersionType=function(request, response){
+  console.log(request.body.reqContent);
+  var data=JSON.parse(request.body.reqContent);
+  var q = Q.defer();
+
+  if(data.reqBody.type_id&&data.reqBody.type_id!=''){
+    update(data.reqBody.type_id).then(function(result){
+       console.log('type result',result)
+       response.send(result);
+    },function(error){
+        response.send(error);
+    });
+
+  }else{
+    create().then(function(result){
+       console.log('type result',result)
+       response.send(result);
+    },function(error){
+        response.send(error);
+    });
+
+  }
+  function create(){
+    var app6 = new versiontype({
+      typename:data.reqBody.typename,
+      typecode:data.reqBody.typecode,
+      typedes: data.reqBody.typedes,
+      createTime:new Date().getTime(),
+      updateTime:new Date().getTime()
+    });
+    app6.save(function(e, product, numberAffected) {
+      // if (e) response.send(e.message);
+        console.log(product);
+        if(product){
+          respondata={
+            "code":"200",
+            "message":"success"
+          };
+          q.resolve(respondata);
+        }else{
+          respondata={
+            "code":"500",
+            "message":"exports"
+          };
+          q.reject(respondata);
+        }
+      });
+      return q.promise;
+  }
+  function update(id){
+    var arr=respon.checknull(data.reqBody)
+    arr['updateTime']=new Date().getTime()
+    console.log(arr)
+    versiontype.update({
+      _id: id,
+    }, arr, function(e, numberAffected, raw) {
+      if(e){
+        respondata={
+          "code":"500",
+          "message":"error"
+        };
+        q.reject(respondata);
+      }else{
+        respondata={
+          "code":"200",
+          "message":"success"
+        };
+        q.resolve(respondata);
+      }
+    });
+    return q.promise;
+  }
+
+}
+
+//articleTypeList
+exports.versionTypeList= function(request, response) {
+  console.log(request.body);
+    var data=JSON.parse(request.body.reqContent);
+  var username=data.reqBody.username;
+  if(username&&username!=null){
+    username={'username':data.reqBody.username}
+  }else{
+    username={};
+  }
+  versiontype.find(username,null,{sort:{"createTime":-1}},function(e, docs) {
+    var head={
+      "code":"200",
+      "message":"success",
+      "data":docs,
+    };
+    var html = JSON.stringify(head);
+    response.send(html);
+  });
+  // conn.close();
+};

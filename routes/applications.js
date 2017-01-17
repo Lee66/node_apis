@@ -238,7 +238,7 @@ exports.getpreapplist=function(request, response) {
 
 }
 
-  function getnewarr(docs){
+function getnewarr(docs){
     var q = Q.defer();
       var newarr=[],module_version='',module_url='',isshow=true
     
@@ -275,7 +275,7 @@ exports.getpreapplist=function(request, response) {
 }
 
 
-  function getprenewarr(docs){
+function getprenewarr(docs){
     var q = Q.defer();
       var newarr=[],module_version='',module_url='',isshow=true
     
@@ -314,11 +314,11 @@ exports.getpreapplist=function(request, response) {
     return q.promise;
 }
 
- function checkphone(phone){
-    var q = Q.defer();
-    var username={'phone':phone}
-    whitelist.whitelist.find(username,null,{sort:{"createTime":-1}},function(e, docs) {
-        	if(e){
+function checkphone(phone){
+  var q = Q.defer();
+  var username={'phone':phone}
+  whitelist.whitelist.find(username,null,{sort:{"createTime":-1}},function(e, docs) {
+    if(e){
 			respondata={
 				"code":"500",
 				"message":"error"
@@ -340,10 +340,10 @@ exports.getpreapplist=function(request, response) {
 					};
            q.resolve(respondata);
 			}
-		}
-	});
+	  }
+  });
   return q.promise;
-  }
+}
 
 //预览版主页接口
 exports.getpreapplistHome=function(request, response) {
@@ -387,9 +387,7 @@ exports.getpreapplistHome=function(request, response) {
     }
 
   });
-
 }
-
 exports.getapplist=function(request, response) {
   console.log(request.query.phone);
   application.find({},'-_id module_name module_code module_path icon.photopath module_status createTime module_type version.version_number version.version_des version.version_status version.code.filepath version.code.createTime',{sort:{"createTime":-1}}, function(e, docs) {
@@ -408,15 +406,15 @@ exports.getapplist=function(request, response) {
         docs[i].isshow=true
       }
       var arr= {
-        'module_id':docs[i].module_code,
-        'module_name':docs[i].module_name,
-        'module_code':docs[i].module_code,
-        'img_url':docs[i].icon.photopath,
+        'app_id':docs[i].module_code,
+        'app_name':docs[i].module_name,
+        'app_user':docs[i].module_code,
+        'icon':docs[i].icon.photopath,
         'link_url':docs[i].module_path,
-        'module_version':module_version,
-        'module_url':module_url,
-        'module_type':docs[i].module_type,
-        'module_des':docs[i].module_des,
+        'app_version':module_version,
+        'download_url':module_url,
+        'app_type':docs[i].module_type,
+        'app_des':docs[i].module_des,
         'is_show':docs[i].isshow,
        }
      newarr[i]=arr
@@ -586,7 +584,6 @@ exports.getpreappDetail=function(request, response) {
     }
   });
 }
-
 exports.getappDetail=function(request, response) {
   console.log(request.params.modelname);
   application.find({module_code:request.params.modelname,module_status:'PUBLIC'},'-_id module_name module_code module_path module_des icon.photopath img_group.photopath version ',{sort:{"createTime":-1}}, function(e, docs) {
@@ -681,4 +678,32 @@ exports.applist=function(request, response){
   });
 }
 
+// 删除应用
+exports.removeApp=function(request, response){
+  respon.loggers(request.body);
+  var data=JSON.parse(request.body.reqContent);
+  application.remove({
+    _id: data.reqBody.id
+  }, function(e) {
+    console.log(e);
+    // if (e) response.send(e.message);
+    // response.setHeader("Access-Control-Allow-Origin", "*")
+    if(e){
+        var respondata={
+          "code":"500",
+          "message":"error"
+        };
+          response.send(respondata);
+      }else{
+        var respondata={
+          "code":"0000",
+          "message":"success",
+        };
+        response.send(respondata);
+        // respon.pushdata("0000","success")
+      }
+    
+    response.send(respondata);
+  });
+}
 
