@@ -1,6 +1,8 @@
 var mongoose = require("mongoose");
 var md5=require("nodejs-md5");
 var Q= require('q');
+var respon=require('./respon.js');
+var config=require('./config.js');
 // 新建一个数据模型
 // 参数1：数据表
 // 参数2：数据格式
@@ -9,8 +11,18 @@ var users = mongoose.model("user", {
 	phone:String,
 	password: String,
 	personfile:Object,
+  email:String,
+  type:Object,
+	typecode:String,
 	createTime:String,
 	updateTime:String
+});
+var usertype = mongoose.model("usertype", {
+  typename:String,
+  typecode:String,
+  typedes: String,
+  createTime:String,
+  updateTime:String
 });
 var path = require('path');
 
