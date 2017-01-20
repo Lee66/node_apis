@@ -4,6 +4,7 @@ var path = require('path');
 var Q= require('q');
 var respon=require('./respon.js');
 var config=require('./config.js');
+var qr = require('qr-image')
 
 var photos = mongoose.model("photos", {
   photoname:String,
@@ -17,6 +18,21 @@ exports.getphoto=function(request, response){
 	targetPath='./uploads/';
 	var filePath=path.join(targetPath,photoname);
 	response.sendfile(filePath);
+}
+
+exports.createQrcode=function(request, res){
+  console.log(request.body);
+  var boltext=request.query.text;
+  console.log(boltext)
+    try {
+        var img = qr.image(boltext);
+        res.writeHead(200, {'Content-Type': 'image/png'});
+        img.pipe(res);
+    } catch (e) {
+        res.writeHead(414, {'Content-Type': 'text/html'});
+        res.end('<h1>414 Request-URI Too Large</h1>');
+    }
+
 }
 
 exports.getphotoPal=function(request, response){

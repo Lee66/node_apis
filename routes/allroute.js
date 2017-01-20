@@ -114,6 +114,7 @@ router.post("/createVideo",video.createVideo);
 router.post("/removeVideo",video.removeVideo);
 router.post("/videoUpload",multipartMiddleware,video.videoupload);
 
+router.get("/create_qrcode",photos.createQrcode);
 
 router.get("/*", index.notfond);
 
