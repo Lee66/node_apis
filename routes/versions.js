@@ -310,6 +310,10 @@ exports.versionlist=function(request, response){
       var newarr=[]
       for(var i=0;i<docs.length;i++)
       {
+        var filepath = ''
+        if(docs[i].code){
+          filepath=docs[i].code.filepath
+        }
         var arr= {
         '_id':docs[i]._id,
         'version_name':docs[i].version_name,
@@ -320,7 +324,7 @@ exports.versionlist=function(request, response){
         'version_status':docs[i].version_status,
         'version_type':docs[i].version_type,
         'version_des':docs[i].version_des,
-        'downloadUrl':config.appconfig.urlapi+docs[i].code.filepath,
+        'downloadUrl':config.appconfig.urlapi+filepath,
         'code_size':docs[i].code_size,
         'code':docs[i].code,
         'createTime':docs[i].createTime,
@@ -415,7 +419,7 @@ exports.fileupload = function(request, response) {
       var uname=item.name.split('-');
       console.log(name);
       var targetPaths='uploads/www/'+uname[0]+'-'+uname[1];
-      var versions=uname[2].split('.apk')
+      var no_versions=uname[2].split('.apk')
       //the path is exist
       var folder_exists = fs.existsSync(targetPaths);
 		  if(folder_exists == true){
@@ -434,9 +438,9 @@ exports.fileupload = function(request, response) {
   			var filename;
   			if(docs&&docs.length>0){
   				console.log('exict',name.length);
-  				filename=uname[0]+'-'+uname[1]+'-'+versions[0]+'-'+tmp_name+'.'+name[name.length-1];
+  				filename=uname[0]+'-'+uname[1]+'-'+no_versions[0]+'-'+tmp_name+'.'+name[name.length-1];
   			}else{
-  				filename=uname[0]+'-'+uname[1]+'-'+versions[0]+'-'+tmp_name+'.'+name[name.length-1];
+  				filename=uname[0]+'-'+uname[1]+'-'+no_versions[0]+'-'+tmp_name+'.'+name[name.length-1];
   			}
   			console.log(filename);
            movefile(filename,targetPaths,tmpPath).then(function(result){
