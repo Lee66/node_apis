@@ -12,6 +12,7 @@ var applications=require("./applications.js");
 var versions=require("./versions.js");
 var whitelist=require("./whitelist.js");
 var video=require("./video.js");
+var sendMail=require("./sendMail.js");
 var router=express.Router();
 var multipart = require('connect-multiparty');
 var multipartMiddleware = multipart();
@@ -115,6 +116,10 @@ router.post("/removeVideo",video.removeVideo);
 router.post("/videoUpload",multipartMiddleware,video.videoupload);
 
 router.get("/create_qrcode",photos.createQrcode);
+
+// send Email
+router.get("/sendEmail",sendMail.sendEmail);
+router.get("/sendSMTPEmail",sendMail.sendSMTPmail);
 
 router.get("/*", index.notfond);
 
