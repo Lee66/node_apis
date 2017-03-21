@@ -1,8 +1,8 @@
 exports.appconfig={
 	'islog':true,
 	'api':'www.wetalks.cn',
-	'urlapi':'http://192.168.2.18:8002/',
-	'imgapi':'http://192.168.2.18:2016/'
+	'urlapi':'http://192.180.3.82:8002/',
+	'imgapi':'http://192.180.3.82:2016/'
 	// http://192.168.2.18:8002/
 	// http://47.88.2.72:8002/
 }

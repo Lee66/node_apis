@@ -770,7 +770,7 @@ exports.removeApp=function(request, response){
           response.send(respondata);
       }else{
         var respondata={
-          "code":"0000",
+          "code":"200",
           "message":"success",
         };
         response.send(respondata);

@@ -118,8 +118,11 @@ router.post("/videoUpload",multipartMiddleware,video.videoupload);
 router.get("/create_qrcode",photos.createQrcode);
 
 // send Email
-router.get("/sendEmail",sendMail.sendEmail);
-router.get("/sendSMTPEmail",sendMail.sendSMTPmail);
+router.post("/sendEmail",sendMail.sendEmail);
+router.post("/sendSMTPEmail",sendMail.sendSMTPmail);
+router.post("/createEmail",sendMail.createEmail);
+router.post("/EmailList",sendMail.EmailList);
+router.post("/removeMail",sendMail.removeMail);
 
 router.get("/*", index.notfond);
 
