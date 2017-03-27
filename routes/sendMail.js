@@ -89,13 +89,13 @@ exports.sendSMTPmail= function(request, responseEd){
 		secureConnection: true, // 使用 SSL
 		port: 465, // SMTP 端口
 		auth: {
-		user: "liuyahui@jfpal.com", // 账号
-		pass: "lyh123" // 密码
+		user: "frontend@jfpal.com", // 账号
+		pass: "JFpal888" // 密码
 		}
 	}));
 	// 设置邮件内容
 	var mailOptions = {
-	 from: "liuyahui@jfpal.com", // 发件地址
+	 from: "frontend@jfpal.com", // 发件地址
 	 to: toEmail, // 收件列表
 	 subject: tirtle, // 标题
 	 text:"hello",
