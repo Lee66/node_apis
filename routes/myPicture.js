@@ -1,5 +1,4 @@
 var mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost/nodeapi");
 var fs = require('fs');
 var path = require('path');
 var Q= require('q');
@@ -8,10 +7,9 @@ var config=require('./config.js');
 // 新建一个数据模型
 // 参数1：数据表
 // 参数2：数据格式
-var article = mongoose.model("article", {
+var picture = mongoose.model("picture", {
 	user:String,
 	tirtle: String,
-    info:String,
 	content:String,
  	type:Object,
 	typecode:String,
@@ -21,17 +19,20 @@ var article = mongoose.model("article", {
 	comment:Object,
 	sea:Number,
 });
-var comments = mongoose.model("comments", {
+
+var comments = mongoose.model("piccomments", {
 	user:String,
 	repayuser:String,
 	content: String,
 	createTime:String,
     updateTime:String
 });
-var articletype = mongoose.model("articletype", {
+
+var picturetype = mongoose.model("picturetype", {
 	typename:String,
 	typecode:String,
 	typedes: String,
+	img_group:Object,
 	createTime:String,
     updateTime:String
 });
@@ -60,10 +61,9 @@ exports.createArticle=function(request, response){
 
   }
   function create(){
-    var app6 = new article({
+    var app6 = new picture({
       user:data.reqBody.user,
       tirtle: data.reqBody.tirtle,
-      info:data.reqBody.info,
 	  type:data.reqBody.type,
 	  typecode:data.reqBody.type.typecode,
       content:data.reqBody.content,
@@ -97,7 +97,7 @@ exports.createArticle=function(request, response){
 		arr['typecode']=data.reqBody.type.typecode,
 		// arr['content']=decodeURI(data.reqBody.content),
     console.log(arr)
-    article.update({
+    picture.update({
 		  _id: id,
 		}, arr, function(e, numberAffected, raw) {
 			if(e){
@@ -165,7 +165,7 @@ exports.MKcommit=function(request, response){
 	function upActicle(product){
 		var q = Q.defer();
 		var allcommernts=[];
-		article.find({
+		picture.find({
 			_id: data.reqBody.id
 		}, function(e, docs) {
 			if(e){
@@ -199,7 +199,7 @@ exports.MKcommit=function(request, response){
 	}
 	function upcomment(allcommernts){
 		var q = Q.defer();
-		article.update({
+		picture.update({
 				_id: data.reqBody.id
 			}, {
 				comment:allcommernts
@@ -244,8 +244,7 @@ exports.articleList= function(request, response) {
   }else{
     typecode={};
   }
-  
-  article.find(typecode,function(e, docs) {
+  picture.find(typecode,function(e, docs) {
     totalRecord=docs.length;
     allpage=totalRecord/data.reqBody.numPerPage
     console.log('allpage',allpage,parseInt(allpage),data.reqBody.numPerPage)
@@ -253,7 +252,7 @@ exports.articleList= function(request, response) {
       allpage=parseInt(allpage)+1
     }
   });
-	article.find(typecode,null,{skip:skips,limit:limit,sort:{"createTime":-1}},function(e, docs) {
+	picture.find(typecode,null,{skip:skips,limit:limit,sort:{"createTime":-1}},function(e, docs) {
 		var head={
 			"code":"200",
 			"message":"success",
@@ -274,7 +273,7 @@ exports.articleList= function(request, response) {
 //getArticle
 exports.ArticleDetail = function(request, response) {
 	var data=JSON.parse(request.body.reqContent);
-	article.find({
+	picture.find({
 		_id: data.reqBody.id
 	}, function(e, docs) {
 		console.log(docs);
@@ -313,7 +312,7 @@ exports.ArticleDetail = function(request, response) {
 	arr['sea']=newSea
 		// arr['content']=decodeURI(data.reqBody.content),
     console.log(arr)
-    article.update({
+    picture.update({
 		  _id: id,
 		}, arr, function(e, numberAffected, raw) {
 			if(e){
@@ -356,7 +355,7 @@ exports.getallArticle= function(request, response) {
     username={};
   }
 	console.log(username)
-  article.find(username,function(e, docs) {
+  picture.find(username,function(e, docs) {
     totalRecord=docs.length;
     allpage=totalRecord/data.numPerPage
     console.log('allpage',allpage,parseInt(allpage),data.numPerPage)
@@ -365,7 +364,7 @@ exports.getallArticle= function(request, response) {
     }
   });
 	console.log(skips,limit)
-	article.find(username,'_id tirtle info typecode type.typename type.typecode img_group.photopath  createTime',{skip:skips,limit:limit,sort:{"createTime":-1}},function(e, docs) {
+	picture.find(username,'_id tirtle info typecode type.typename type.typecode img_group.photopath  createTime',{skip:skips,limit:limit,sort:{"createTime":-1}},function(e, docs) {
 		var head={
 			"code":"200",
 			"message":"success",
@@ -386,7 +385,7 @@ exports.getallArticle= function(request, response) {
 
 //home page getarticlelist
 exports.getarticlelist= function(request, response) {
-	articletype.find({},null,{sort:{"createTime":-1}},function(e, docs) {
+	picturetype.find({},null,{sort:{"createTime":-1}},function(e, docs) {
 		if(e){
 			respondata={
           "code":"500",
@@ -394,7 +393,7 @@ exports.getarticlelist= function(request, response) {
         };
 				response.send(respondata)
 		}else{
-			var article={}
+			var picture={}
 			var com=docs
 				getlist().then(function(result){
 						var rusl=connet(com,result)
@@ -418,11 +417,11 @@ exports.getarticlelist= function(request, response) {
 						for(var i=0;i<com.length;i++)
 						{
 									newcom[i]={}
-									newcom[i]['article']=[]
+									newcom[i]['picture']=[]
 									for(var j=0;j<result.length;j++){
 											if(result[j].typecode==com[i].typecode){
 												newcom[i]['type']=result[j].type
-													newcom[i]['article'].push(result[j])
+													newcom[i]['picture'].push(result[j])
 												// console.log('com new',com[i].articles)
 											}
 									}
@@ -432,7 +431,7 @@ exports.getarticlelist= function(request, response) {
 	}
 	function getlist(code){
 		var q = Q.defer();
-		article.find({},'_id tirtle info typecode type.typename type.typecode img_group.photopath  createTime',{sort:{"createTime":-1}},function(e, docs) {
+		picture.find({},'_id tirtle info typecode type.typename type.typecode img_group.photopath  createTime',{sort:{"createTime":-1}},function(e, docs) {
 			if(e){
 				q.reject(respondata);
 			}else{
@@ -456,7 +455,7 @@ exports.getarticlelist= function(request, response) {
 //getArticle
 exports.getArticle = function(request, response) {
 	console.log(request.params.name);
-	article.find({
+	picture.find({
 		_id: request.params.name
 	}, function(e, docs) {
 		console.log(docs);
@@ -491,7 +490,7 @@ exports.getArticle = function(request, response) {
 exports.delArticle = function(request, response) {
 	console.log(request.body);
 	var data=JSON.parse(request.body.reqContent);
-	article.remove({
+	picture.remove({
 		_id: data.reqBody.id
 	}, function(e) {
 		console.log(e);
@@ -538,10 +537,11 @@ exports.createArticleType=function(request, response){
 
   }
   function create(){
-    var app6 = new articletype({
+    var app6 = new picturetype({
       typename:data.reqBody.typename,
       typecode:data.reqBody.typecode,
       typedes: data.reqBody.typedes,
+      img_group:data.reqBody.img_group,
       createTime:new Date().getTime(),
       updateTime:new Date().getTime()
     });
@@ -568,7 +568,7 @@ exports.createArticleType=function(request, response){
     var arr=respon.checknull(data.reqBody)
     arr['updateTime']=new Date().getTime()
     console.log(arr)
-    articletype.update({
+    picturetype.update({
 		  _id: id,
 		}, arr, function(e, numberAffected, raw) {
 			if(e){
@@ -601,7 +601,7 @@ exports.articleTypeList= function(request, response) {
   }else{
     username={};
   }
-	articletype.find(username,null,{sort:{"createTime":-1}},function(e, docs) {
+	picturetype.find(username,null,{sort:{"createTime":-1}},function(e, docs) {
 		var head={
 			"code":"200",
 			"message":"success",

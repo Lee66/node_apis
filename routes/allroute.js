@@ -4,6 +4,7 @@ var article=require("./articles.js");
 var talks=require("./talks.js");
 var photos=require("./photos.js");
 var users=require("./users.js");
+var mypicture=require("./myPicture.js");
 
 var downcount=require("./downcount.js");
 var collects=require("./collects.js");
@@ -48,6 +49,18 @@ router.post("/createArticleType", article.createArticleType);
 router.post("/articletypelist", article.articleTypeList);
 
 router.get("/getarticle/:name",article.getArticle);
+
+//my picture
+
+router.post("/createPicture", mypicture.createArticle);
+router.post("/PictureList", mypicture.articleList);
+router.post("/PictureDetail", mypicture.ArticleDetail);
+router.post("/MKcommit", mypicture.MKcommit);
+router.post("/DelPicture", mypicture.delArticle);
+router.post("/createPictureType", mypicture.createArticleType);
+router.post("/Picturetypelist", mypicture.articleTypeList);
+
+router.get("/getPicture/:name",mypicture.getArticle);
 
 
 router.post("/createTalks", talks.createArticle);
