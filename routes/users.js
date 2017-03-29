@@ -14,6 +14,7 @@ var users = mongoose.model("user", {
   email:String,
   type:Object,
 	typecode:String,
+  content:String,
 	createTime:String,
 	updateTime:String
 });
@@ -64,6 +65,7 @@ exports.register = function(request, response) {
             password:md5.string.quiet(data.reqBody.password),
             phone:data.reqBody.phone,
             emial: data.reqBody.emial,
+            content:data.reqBody.content,
             createTime:new Date().getTime(),
             updateTime:new Date().getTime(),
         });
@@ -165,6 +167,7 @@ exports.createUser=function(request, response){
             phone:data.reqBody.phone,
             email: data.reqBody.email,
             type:data.reqBody.type,
+            content:data.reqBody.content,
             personfile:data.reqBody.personfile,
 			typecode:data.reqBody.type.typecode,
             createTime:new Date().getTime(),
@@ -303,7 +306,7 @@ exports.finduser=function(request, response){
 	console.log(data.reqBean);
 	console.log(data.reqBody);
 	users.find({
-		_id: data.reqBody.id
+		username: data.reqBody.username
 	}, function(e, docs) {
 		console.log(docs);
 		if(e){
@@ -315,13 +318,13 @@ exports.finduser=function(request, response){
 			respondata={
 				"code":"200",
 				"message":"success",
-				"docs":docs
+				"data":docs
 			};
 		}else{
 			respondata={
 				"code":"500",
-				"message":"exports",
-				"docs":docs
+				"message":"can not find this user",
+				"data":docs
 			};
 		}
 		response.send(respondata);
