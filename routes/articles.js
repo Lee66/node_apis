@@ -229,7 +229,6 @@ exports.MKcommit=function(request, response){
 exports.articleList= function(request, response) {
 	console.log(request.body);
 		var data=JSON.parse(request.body.reqContent);
-	console.log(data.reqBody.pageNum);
   if(data.reqBody.pageNum==1){
     var pageindex=0;//o biegin
   }else{
@@ -248,7 +247,7 @@ exports.articleList= function(request, response) {
   article.find(typecode,function(e, docs) {
     totalRecord=docs.length;
     allpage=totalRecord/data.reqBody.numPerPage
-    console.log('allpage',allpage,parseInt(allpage),data.reqBody.numPerPage)
+    // console.log('allpage',allpage,parseInt(allpage),data.reqBody.numPerPage)
     if(allpage>parseInt(allpage)){
       allpage=parseInt(allpage)+1
     }

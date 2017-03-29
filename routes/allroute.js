@@ -14,6 +14,7 @@ var versions=require("./versions.js");
 var whitelist=require("./whitelist.js");
 var video=require("./video.js");
 var sendMail=require("./sendMail.js");
+var dataStati=require("./dataStati.js")
 var router=express.Router();
 var multipart = require('connect-multiparty');
 var multipartMiddleware = multipart();
@@ -35,9 +36,11 @@ router.post("/imgupload",multipartMiddleware,photos.imgupload);
 router.get("/getphoto/:photoname",photos.getphoto);
 router.get("/getphotoPal/:photopath/:photoname",photos.getphotoPal);
 
-
 //media
 router.post("/photoslist",photos.photoslist);
+
+router.post("/dataStati",dataStati.connect)
+router.post("/dataStatiList",dataStati.dataStatiList)
 //article
 
 router.post("/createArticle", article.createArticle);

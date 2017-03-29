@@ -229,7 +229,7 @@ exports.MKcommit=function(request, response){
 exports.articleList= function(request, response) {
 	console.log(request.body);
 		var data=JSON.parse(request.body.reqContent);
-	console.log(data.reqBody.pageNum);
+	// console.log(data.reqBody.pageNum);
   if(data.reqBody.pageNum==1){
     var pageindex=0;//o biegin
   }else{
@@ -247,7 +247,7 @@ exports.articleList= function(request, response) {
   picture.find(typecode,function(e, docs) {
     totalRecord=docs.length;
     allpage=totalRecord/data.reqBody.numPerPage
-    console.log('allpage',allpage,parseInt(allpage),data.reqBody.numPerPage)
+    // console.log('allpage',allpage,parseInt(allpage),data.reqBody.numPerPage)
     if(allpage>parseInt(allpage)){
       allpage=parseInt(allpage)+1
     }
@@ -520,6 +520,7 @@ exports.createArticleType=function(request, response){
   var q = Q.defer();
 
   if(data.reqBody.type_id&&data.reqBody.type_id!=''){
+  	console.log('update')
     update(data.reqBody.type_id).then(function(result){
        console.log('type result',result)
        response.send(result);
@@ -528,6 +529,7 @@ exports.createArticleType=function(request, response){
     });
 
   }else{
+  	console.log('create')
     create().then(function(result){
        console.log('type result',result)
        response.send(result);
@@ -547,7 +549,7 @@ exports.createArticleType=function(request, response){
     });
     app6.save(function(e, product, numberAffected) {
       // if (e) response.send(e.message);
-        console.log(product);
+        console.log('produvt',product);
         if(product){
           respondata={
             "code":"200",
