@@ -66,7 +66,7 @@ exports.createArticle=function(request, response){
       info:data.reqBody.info,
 	  type:data.reqBody.type,
 	  typecode:data.reqBody.type.typecode,
-      content:data.reqBody.content,
+      content:unescape(data.reqBody.content),
       img_group:data.reqBody.img_group,
       sea:1,
       createTime:new Date().getTime(),
@@ -95,7 +95,7 @@ exports.createArticle=function(request, response){
     var arr=respon.checknull(data.reqBody)
     arr['updateTime']=new Date().getTime()
 		arr['typecode']=data.reqBody.type.typecode,
-		// arr['content']=decodeURI(data.reqBody.content),
+		arr['content']=unescape(data.reqBody.content),
     console.log(arr)
     article.update({
 		  _id: id,
