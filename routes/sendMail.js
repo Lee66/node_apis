@@ -31,7 +31,7 @@ exports.sendEmail=function(request, response){
 	var data=JSON.parse(request.body.reqContent);
 	var tirtle=data.reqBody.tirtle
 	var toEmail=data.reqBody.toEmail
-	var content='UserName:'+data.reqBody.username+'</br> UserEmail:'+data.reqBody.email+data.reqBody.content
+	var content='UserName:'+data.reqBody.username+'</br> UserEmail:'+data.reqBody.email+'</br> content:'+data.reqBody.content
 	var transporter = nodemailer.createTransport({
 	    // service: 'Gmail',
 	    service: 'qq',

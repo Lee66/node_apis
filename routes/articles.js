@@ -228,7 +228,7 @@ exports.MKcommit=function(request, response){
 //文章列表
 exports.articleList= function(request, response) {
 	console.log(request.body);
-		var data=JSON.parse(request.body.reqContent);
+  var data=JSON.parse(request.body.reqContent);
   if(data.reqBody.pageNum==1){
     var pageindex=0;//o biegin
   }else{
@@ -258,7 +258,7 @@ exports.articleList= function(request, response) {
 			"message":"success",
 			"data":docs,
 			"page":{
-				 "totalRecord":totalRecord,
+				"totalRecord":totalRecord,
                 "pageIndex":data.reqBody.pageNum,
                 "pageNum":limit,
                 "allpage":allpage
