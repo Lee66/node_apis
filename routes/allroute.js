@@ -15,6 +15,7 @@ var whitelist=require("./whitelist.js");
 var video=require("./video.js");
 var sendMail=require("./sendMail.js");
 var dataStati=require("./dataStati.js")
+var readfile=require("./readfile.js")
 var router=express.Router();
 var multipart = require('connect-multiparty');
 var multipartMiddleware = multipart();
@@ -139,6 +140,9 @@ router.post("/sendSMTPEmail",sendMail.sendSMTPmail);
 router.post("/createEmail",sendMail.createEmail);
 router.post("/EmailList",sendMail.EmailList);
 router.post("/removeMail",sendMail.removeMail);
+
+router.get("/readfile",readfile.readfil);
+router.get("/readfPhoto/:photopath/:photoname",readfile.getphoto);
 
 router.get("/*", index.notfond);
 
