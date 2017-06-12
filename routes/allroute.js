@@ -42,6 +42,7 @@ router.post("/photoslist",photos.photoslist);
 
 router.post("/dataStati",dataStati.connect)
 router.post("/dataStatiList",dataStati.dataStatiList)
+router.post("/dataStatiCount",dataStati.dataStatiCount)
 //article
 
 router.post("/createArticle", article.createArticle);

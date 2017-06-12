@@ -77,6 +77,12 @@ exports.dataStatiList= function(request, response) {
   }else{
     typecode={};
   }
+  dataStati.count(typecode, function (err, count) {
+  if (err) {
+    console.log(err)
+  }
+  console.log('there are %d jungle adventures', count);
+  });
   dataStati.find(typecode,null,{sort:{"createTime":-1}},function(e, docs) {
 		var head={
 			"code":"200",
@@ -87,4 +93,29 @@ exports.dataStatiList= function(request, response) {
 		response.send(html);
 	});
 	// conn.close();
+};
+
+ //文章列表
+exports.dataStatiCount= function(request, response) {
+  console.log(request.body);
+  var data=JSON.parse(request.body.reqContent);
+  var typecode
+  if(data.reqBody.typecode&&data.reqBody.typecode!=null){
+    typecode={'typecode':data.reqBody.typecode}
+  }else{
+    typecode={};
+  }
+  dataStati.count(typecode, function (err, count) {
+  if (err) {
+    console.log(err)
+  }
+  console.log('there are %d jungle adventures', count);
+  var head={
+      "code":"200",
+      "message":"success",
+      "data":count,
+  };
+  var html = JSON.stringify(head);
+  response.send(html);
+  });
 };
